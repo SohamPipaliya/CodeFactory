@@ -6,9 +6,7 @@ namespace CodeFactory.DAL
     public class Context : DbContext
     {
         public Context(DbContextOptions<Context> optionsBuilder) : base(optionsBuilder)
-        {
-
-        }
+        { }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         //    optionsBuilder.UseSqlServer(Configuration["ConnectionStrings:CodeFactory"]);

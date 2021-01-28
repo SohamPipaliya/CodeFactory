@@ -6279,11 +6279,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\DAL\\DAL.csproj",
+      "projectUniqueName": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\DAL\\DAL.csproj",
       "projectName": "DAL",
-      "projectPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\DAL\\DAL.csproj",
+      "projectPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\DAL\\DAL.csproj",
       "packagesPath": "C:\\Users\\SOHAM\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\DAL\\obj\\",
+      "outputPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\SOHAM\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -6300,11 +6300,11 @@
         "net5.0": {
           "targetAlias": "netcoreapp5.0",
           "projectReferences": {
-            "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj": {
-              "projectPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj"
+            "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj": {
+              "projectPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj"
             },
-            "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Models\\Models.csproj": {
-              "projectPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Models\\Models.csproj"
+            "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Models\\Models.csproj": {
+              "projectPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Models\\Models.csproj"
             }
           }
         }

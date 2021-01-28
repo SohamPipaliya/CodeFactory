@@ -28,7 +28,7 @@ namespace Models.Model
         public string Email { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime RegistrationDate { get; set; }
+        public DateTime? RegistrationDate { get; set; }
 
         [DataType(DataType.ImageUrl)]
         public string? Image { get; set; }

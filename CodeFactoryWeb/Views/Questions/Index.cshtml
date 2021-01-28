@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Models.Model.Question>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image3)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image4)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image5)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AskedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                <img src="@GetImage(item.Image)" height="25" width="25" alt="" />
+            </td>
+            <td>
+                <img src="@GetImage(item.Image2)" height="25" width="25" alt="" />
+            </td>
+            <td>
+                <img src="@GetImage(item.Image3)" height="25" width="25" alt="" />
+            </td>
+            <td>
+                <img src="@GetImage(item.Image4)" height="25" width="25" alt="" />
+            </td>
+            <td>
+                <img src="@GetImage(item.Image5)" height="25" width="25" alt="" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AskedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Email)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Question_ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Question_ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Question_ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

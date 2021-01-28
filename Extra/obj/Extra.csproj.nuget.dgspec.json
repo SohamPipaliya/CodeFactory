@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj": {}
+    "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj": {}
   },
   "projects": {
-    "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj": {
+    "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj",
+        "projectUniqueName": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj",
         "projectName": "Extra",
-        "projectPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\Extra.csproj",
+        "projectPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\Extra.csproj",
         "packagesPath": "C:\\Users\\SOHAM\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\SOHAM\\Downloads\\CodeFactory\\Extra\\obj\\",
+        "outputPath": "C:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\Extra\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\SOHAM\\AppData\\Roaming\\NuGet\\NuGet.Config",

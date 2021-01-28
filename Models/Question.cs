@@ -13,6 +13,9 @@ namespace Models.Model
         [Required]
         public string Title { get; set; }
 
+        [Required]
+        public string Description { get; set; }
+
         public string? Code { get; set; }
 
         public string? Image { get; set; }
@@ -24,9 +27,6 @@ namespace Models.Model
         public string? Image4 { get; set; }
 
         public string? Image5 { get; set; }
-
-        [Required]
-        public string Description { get; set; }
 
         public DateTime AskedDate { get; set; }
 

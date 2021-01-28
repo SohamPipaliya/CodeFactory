@@ -9,7 +9,6 @@ namespace CodeFactory.DAL
 {
     public class Repository<T> : IDisposable where T : class
     {
-
         private DbSet<T> model;
 
         public Context context { get; }
@@ -38,7 +37,7 @@ namespace CodeFactory.DAL
             model.Find(predicate);
 
         public ValueTask<T> FindAsync(object PKey) =>
-             model.FindAsync(PKey);
+              model.FindAsync(PKey);
 
         public Task<T> FindAsync(Expression<Func<T, bool>> predicate) =>
              model.FirstAsync(predicate);
@@ -48,7 +47,7 @@ namespace CodeFactory.DAL
         public Task<List<T>> GetAllAsync() =>
              model.ToListAsync();
 
-        public async Task RemoveAsync(object id) =>
+        public async Task<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T>> RemoveAsync(object id) =>
             model.Remove(await FindAsync(id));
 
         public void Remove(T entity) =>

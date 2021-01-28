@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Model;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using static CodeFactoryAPI.Extra.Addons;
+using static System.IO.File;
+using static Utf8Json.JsonSerializer;
 
 namespace CodeFactoryAPI.Controllers
 {
@@ -23,28 +24,40 @@ namespace CodeFactoryAPI.Controllers
             unit = new(context);
 
         [HttpGet]
-        public IEnumerable<User> Get() =>
-            unit.GetUser.GetAll();
+        public IActionResult Get() =>
+           Ok(ToJsonString(unit.GetUser.GetAll()));
 
-
-        [HttpGet("{id}")]
-        public async Task<User> Get(Guid id) =>
-            await unit.GetUser.FindAsync(id).ConfigureAwait(false);
-
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            try
+            {
+                var user = await unit.GetUser.FindAsync(id).ConfigureAwait(false);
+                return user == null ? NotFound() : Ok(ToJsonString(user));
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] User user, IFormFile? file)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                try
                 {
-                    var exist = await unit.GetUser.AnyAsync(x => x.UserName == user.UserName);
+                    var exist = await unit.GetUser
+                                        .AnyAsync(x => x.UserName == user.UserName)
+                                        .ConfigureAwait(false);
                     if (exist)
-                        return StatusCode(208, "Username is already taken");
+                        return StatusCode(208, "Username is already taken"); // 208 for already reported
+
                     user.User_ID = Guid.NewGuid();
                     user.RegistrationDate = DateTime.Now;
                     user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
+
                     if (file is not null)
                     {
                         var extension = Path.GetExtension(file.FileName).ToUpper();
@@ -53,85 +66,123 @@ namespace CodeFactoryAPI.Controllers
                             if (file.Length > 51200 && file.Length < 1073741825)
                             {
                                 user.Image = Guid.NewGuid() + " - " + user.UserName + extension;
-                                using (var fs = new FileStream(ImagePath(user.Image), FileMode.Create))
-                                {
-                                    await file.CopyToAsync(fs).ConfigureAwait(false);
-                                    await fs.FlushAsync().ConfigureAwait(false);
-                                }
+                                using var fs = new FileStream(ImagePath(user.Image), FileMode.Create);
+
+                                await file.CopyToAsync(fs).ConfigureAwait(false);
+                                await fs.FlushAsync().ConfigureAwait(false);
+                                await fs.DisposeAsync().ConfigureAwait(false);
                             }
-                            else
-                                return StatusCode(406, "Image size must be between 50 KB to 1 MB");
+                            else return StatusCode(406, "Image size must be between 50 KB to 1 MB");
                         }
-                        else
-                            return StatusCode(415, "Select valid Image");
+                        else return StatusCode(415, "Select valid Image");
                     }
+
                     unit.GetUser.Add(user);
-                    if (await unit.SaveAsync() > 0)
+                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
                         return StatusCode(201);
-                    else
-                        return StatusCode(500);
                 }
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
+                catch (Exception ex)
+                {
+                    await ex.LogAsync().ConfigureAwait(false);
+                }
                 return StatusCode(500);
             }
+            return BadRequest();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, [FromBody] User user)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Put(Guid id, [FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] User user, IFormFile? file)
         {
-            if (id != user.User_ID)
-                return BadRequest();
-            try
+            if (id != user.User_ID) return BadRequest();
+            else if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                try
                 {
-                    user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
                     unit.GetUser.context.Attach(user);
-                    unit.GetUser.context.Entry(user)
-                        .SetUpdatedColumns("UserName", "Password", "Email");
-                    if (await unit.SaveAsync() > 0)
-                        return Ok();
+                    user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
+
+                    if (file is not null)
+                    {
+                        var extension = Path.GetExtension(file.FileName).ToUpper();
+                        if (extension is ".JPG" || extension is ".PNG" || extension is ".JPEG")
+                        {
+                            if (file.Length > 51200 && file.Length < 1073741825)
+                            {
+                                user.Image = Guid.NewGuid() + " - " + user.UserName + extension;
+                                using var fs = new FileStream(ImagePath(user.Image), FileMode.Create);
+
+                                await file.CopyToAsync(fs).ConfigureAwait(false);
+                                await fs.FlushAsync().ConfigureAwait(false);
+                                await fs.DisposeAsync().ConfigureAwait(false);
+                            }
+                            else return StatusCode(406, "Image size must be between 50 KB to 1 MB");
+                        }
+                        else return StatusCode(415, "Select valid Image");
+
+                        var model = await unit.GetUser.Model
+                                              .AsNoTracking()
+                                              .FirstAsync(x => x.User_ID == id)
+                                              .ConfigureAwait(false);
+
+                        if (model?.Image is not null)
+                        {
+                            var path = ImagePath(model.Image);
+                            if (Exists(path))
+                                System.IO.File.Delete(path);
+                        }
+
+                        unit.GetUser.context.Entry(user)
+                            .SetUpdatedColumns("UserName", "Password", "Email", "Image");
+                    }
                     else
-                        return StatusCode(500);
+                        unit.GetUser.context.Entry(user)
+                            .SetUpdatedColumns("UserName", "Password", "Email");
+
+                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                        return Ok();
                 }
-                return BadRequest();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                var exist = await unit.GetUser.AnyAsync(x => x.UserName == user.UserName);
-                if (exist)
+                catch (Exception ex)
                 {
-                    return StatusCode(208, "Username is already taken");
+                    var model = await unit.GetUser
+                                        .FindAsync(id)
+                                        .ConfigureAwait(false);
+                    if (model is null)
+                        return NotFound("No user found");
+                    else if (user.UserName == model.UserName)
+                        return StatusCode(208, "Username is already taken");
+
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
-                exist = await unit.GetUser.AnyAsync(x => x.User_ID == id).ConfigureAwait(false);
-                if (!exist)
-                {
-                    return NotFound();
-                }
-                await ex.LogAsync().ConfigureAwait(false);
                 return StatusCode(500);
             }
+            else return BadRequest();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
-                await unit.GetUser.RemoveAsync(id);
-                if (await unit.SaveAsync() > 0)
+                var model = await unit.GetUser.RemoveAsync(id);
+
+                if (model?.Entity.Image is not null)
+                {
+                    var path = ImagePath(model.Entity.Image);
+                    if (Exists(path))
+                        System.IO.File.Delete(path);
+                }
+
+                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
                     return Ok();
             }
             catch (Exception ex)
             {
                 var exist = await unit.GetUser
-                   .AnyAsync(x => x.User_ID == id).ConfigureAwait(false);
-                if (!exist)
-                    return NotFound();
+                                    .FindAsync(id)
+                                    .ConfigureAwait(false);
+
+                if (exist == null) return NotFound();
+
                 await ex.LogAsync().ConfigureAwait(false);
             }
             return StatusCode(500);
@@ -147,7 +198,6 @@ namespace CodeFactoryAPI.Controllers
             GC.SuppressFinalize(this);
         }
 
-        [NonAction]
         protected void Dispose(bool disposing)
         {
             if (!disposed)

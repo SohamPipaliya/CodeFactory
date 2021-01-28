@@ -1,0 +1,12 @@
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\bin\Release\netcoreapp5.0\Extra.deps.json
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\bin\Release\netcoreapp5.0\Extra.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\bin\Release\netcoreapp5.0\ref\Extra.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\bin\Release\netcoreapp5.0\Extra.pdb
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.csprojAssemblyReference.cache
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.AssemblyInfoInputs.cache
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.AssemblyInfo.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.csproj.CoreCompileInputs.cache
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\ref\Extra.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\Extra\obj\Release\netcoreapp5.0\Extra.pdb
