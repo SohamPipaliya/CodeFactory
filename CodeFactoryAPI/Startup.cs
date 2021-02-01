@@ -1,4 +1,4 @@
-using CodeFactory.DAL;
+using CodeFactoryAPI.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,8 +27,7 @@ namespace CodeFactoryAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CodeFactoryAPI", Version = "v1" });
             });
 
-            var connectionString = Configuration.GetConnectionString("CodeFactory");
-            services.AddDbContextPool<Context>(x => x.UseSqlServer(connectionString));
+            services.AddDbContextPool<Context>(x => x.UseSqlServer(Configuration.GetConnectionString("CodeFactory")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

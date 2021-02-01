@@ -1,12 +1,12 @@
-﻿using CodeFactory.DAL;
+﻿using CodeFactoryAPI.DAL;
 using CodeFactoryAPI.Extra;
-using Extra;
+using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models.Model;
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using static CodeFactoryAPI.Extra.Addons;
 using static System.IO.File;
@@ -37,7 +37,7 @@ namespace CodeFactoryAPI.Controllers
             }
             catch
             {
-                return StatusCode(500);
+                return NotFound();
             }
         }
 
@@ -52,7 +52,7 @@ namespace CodeFactoryAPI.Controllers
                                         .AnyAsync(x => x.UserName == user.UserName)
                                         .ConfigureAwait(false);
                     if (exist)
-                        return StatusCode(208, "Username is already taken"); // 208 for already reported
+                        return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
                     user.User_ID = Guid.NewGuid();
                     user.RegistrationDate = DateTime.Now;
@@ -72,20 +72,20 @@ namespace CodeFactoryAPI.Controllers
                                 await fs.FlushAsync().ConfigureAwait(false);
                                 await fs.DisposeAsync().ConfigureAwait(false);
                             }
-                            else return StatusCode(406, "Image size must be between 50 KB to 1 MB");
+                            else return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
                         }
-                        else return StatusCode(415, "Select valid Image");
+                        else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
                     }
 
                     unit.GetUser.Add(user);
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return StatusCode(201);
+                        return StatusCode((int)HttpStatusCode.Created);
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
                 }
-                return StatusCode(500);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             return BadRequest();
         }
@@ -98,7 +98,7 @@ namespace CodeFactoryAPI.Controllers
             {
                 try
                 {
-                    unit.GetUser.context.Attach(user);
+                    unit.GetUser.Context.Attach(user);
                     user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
 
                     if (file is not null)
@@ -115,9 +115,9 @@ namespace CodeFactoryAPI.Controllers
                                 await fs.FlushAsync().ConfigureAwait(false);
                                 await fs.DisposeAsync().ConfigureAwait(false);
                             }
-                            else return StatusCode(406, "Image size must be between 50 KB to 1 MB");
+                            else return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
                         }
-                        else return StatusCode(415, "Select valid Image");
+                        else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
 
                         var model = await unit.GetUser.Model
                                               .AsNoTracking()
@@ -131,11 +131,11 @@ namespace CodeFactoryAPI.Controllers
                                 System.IO.File.Delete(path);
                         }
 
-                        unit.GetUser.context.Entry(user)
+                        unit.GetUser.Context.Entry(user)
                             .SetUpdatedColumns("UserName", "Password", "Email", "Image");
                     }
                     else
-                        unit.GetUser.context.Entry(user)
+                        unit.GetUser.Context.Entry(user)
                             .SetUpdatedColumns("UserName", "Password", "Email");
 
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
@@ -149,11 +149,11 @@ namespace CodeFactoryAPI.Controllers
                     if (model is null)
                         return NotFound("No user found");
                     else if (user.UserName == model.UserName)
-                        return StatusCode(208, "Username is already taken");
+                        return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
                     await ex.LogAsync().ConfigureAwait(false);
                 }
-                return StatusCode(500);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -185,7 +185,7 @@ namespace CodeFactoryAPI.Controllers
 
                 await ex.LogAsync().ConfigureAwait(false);
             }
-            return StatusCode(500);
+            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose

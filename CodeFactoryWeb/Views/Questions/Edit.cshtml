@@ -1,4 +1,4 @@
-﻿@model Models.Model.Question
+﻿@model CodeFactoryAPI.Models.Question
 
 @{
     ViewData["Title"] = "Edit";
@@ -33,9 +33,9 @@
                 <span asp-validation-for="User_ID" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
+                <label asp-for="Image1" class="control-label"></label>
                 <input type="file" class="custom-file" name="files" multiple />
-                <span asp-validation-for="Image" class="text-danger"></span>
+                <span asp-validation-for="Image1" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

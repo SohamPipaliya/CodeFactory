@@ -1,9 +1,9 @@
-﻿using CodeFactory.DAL;
+﻿using CodeFactoryAPI.DAL;
 using CodeFactoryAPI.Extra;
-using Extra;
+using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Models.Model;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CodeFactoryAPI.Controllers
@@ -25,7 +25,8 @@ namespace CodeFactoryAPI.Controllers
                 user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
 
                 bool exist = await unit.GetUser
-                                       .AnyAsync(x => x.UserName == user.UserName && x.Password == user.Password)
+                                       .AnyAsync(x => x.UserName == user.UserName &&
+                                                      x.Password == user.Password)
                                        .ConfigureAwait(false);
 
                 return exist ? Ok() : NotFound();
@@ -33,7 +34,7 @@ namespace CodeFactoryAPI.Controllers
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode(500);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 

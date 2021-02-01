@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Models.Model;
+using CodeFactoryAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -99,29 +99,29 @@ namespace CodeFactoryAPI.Extra
 
             if (files.Length is 1)
             {
-                list.Add(question.Image = Guid.NewGuid() + extension);
+                list.Add(question.Image1 = Guid.NewGuid() + extension);
             }
             else if (files.Length is 2)
             {
-                list.Add(question.Image = Guid.NewGuid() + extension);
+                list.Add(question.Image1 = Guid.NewGuid() + extension);
                 list.Add(question.Image2 = Guid.NewGuid() + extension);
             }
             else if (files.Length is 3)
             {
-                list.Add(question.Image = Guid.NewGuid() + extension);
+                list.Add(question.Image1 = Guid.NewGuid() + extension);
                 list.Add(question.Image2 = Guid.NewGuid() + extension);
                 list.Add(question.Image3 = Guid.NewGuid() + extension);
             }
             else if (files.Length is 4)
             {
-                list.Add(question.Image = Guid.NewGuid() + extension);
+                list.Add(question.Image1 = Guid.NewGuid() + extension);
                 list.Add(question.Image2 = Guid.NewGuid() + extension);
                 list.Add(question.Image3 = Guid.NewGuid() + extension);
                 list.Add(question.Image4 = Guid.NewGuid() + extension);
             }
             else if (files.Length is 5)
             {
-                list.Add(question.Image = Guid.NewGuid() + extension);
+                list.Add(question.Image1 = Guid.NewGuid() + extension);
                 list.Add(question.Image2 = Guid.NewGuid() + extension);
                 list.Add(question.Image3 = Guid.NewGuid() + extension);
                 list.Add(question.Image4 = Guid.NewGuid() + extension);
@@ -140,7 +140,7 @@ namespace CodeFactoryAPI.Extra
         #endregion
 
         #region SetMetaData
-        public static Task<IEnumerable<T>> SetMetaData<T>(this IEnumerable<T> data, params Action<T>[] actions)
+        public static Task<IEnumerable<T>> SetMetaDataAsync<T>(this IEnumerable<T> data, params Action<T>[] actions)
             where T : class => Task.Run(() =>
         {
             if (data is null)
@@ -153,7 +153,7 @@ namespace CodeFactoryAPI.Extra
             return data;
         });
 
-        public static Task<T> SetMetaData<T>(this T data, params Action<T>[] actions)
+        public static Task<T> SetMetaDataAsync<T>(this T data, params Action<T>[] actions)
             where T : class => Task.Run(() =>
         {
             if (data is null)
@@ -166,13 +166,13 @@ namespace CodeFactoryAPI.Extra
         });
         #endregion
 
-        #region DeleteQuestionImages
+        #region DeleteImages
         public static void DeleteImages(this Question question)
         {
             string path;
-            if (question.Image is not null)
+            if (question.Image1 is not null)
             {
-                path = ImagePath(question.Image, "Questions");
+                path = ImagePath(question.Image1, "Questions");
                 if (Exists(path))
                     Delete(path);
             }
@@ -211,6 +211,31 @@ namespace CodeFactoryAPI.Extra
                     return item;
 
             return null;
+        });
+        #endregion
+
+        #region LogException
+        public static Task LogAsync(this Exception value) => Task.Run(() =>
+        {
+            try
+            {
+                var x = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Errors.log");
+
+                using StreamWriter writer = new(path, true) { AutoFlush = true };
+
+                writer.WriteLine($"Date:-   {DateTime.Now}");
+                writer.WriteLine($"Exception:-   {value.Message}");
+                if (value.InnerException is not null)
+                    writer.WriteLine($"Inner Exception:-   {value.InnerException.Message}");
+                if (value.StackTrace is not null)
+                    writer.WriteLine($"StackTrace:-   {value.StackTrace.Split("   ")[^1]}");
+                writer.WriteLine();
+
+                writer.Flush();
+                writer.Close();
+            }
+            catch { }
         });
         #endregion
     }

@@ -1,14 +1,13 @@
-﻿using CodeFactory.DAL;
-using CodeFactoryAPI.Extra;
-using Extra;
+﻿using CodeFactoryAPI.Extra;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models.Model;
+using CodeFactoryAPI.Models;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 using static Utf8Json.JsonSerializer;
+using CodeFactoryAPI.DAL;
 
 namespace CodeFactoryAPI.Controllers
 {
@@ -25,8 +24,8 @@ namespace CodeFactoryAPI.Controllers
         public async Task<IActionResult> Getquestions() =>
                 Ok(ToJsonString(await unit.GetQuestion.Model
                     .Include(x => x.User)
-                    .SetMetaData(x => x.User.Password = null,
-                                 x => x.User.RegistrationDate = null)
+                    .SetMetaDataAsync(x => x.User.Password = null,
+                                      x => x.User.RegistrationDate = null)
                     .ConfigureAwait(false)));
 
         [HttpGet("{id}")]
@@ -44,8 +43,8 @@ namespace CodeFactoryAPI.Controllers
                 question.User = await (await unit.GetUser.Model
                                          .FirstOneAsync(x => x.User_ID == question.User_ID)
                                          .ConfigureAwait(false))
-                                         .SetMetaData(x => x.Password = null,
-                                                      x => x.RegistrationDate = null)
+                                         .SetMetaDataAsync(x => x.Password = null,
+                                                           x => x.RegistrationDate = null)
                                          .ConfigureAwait(false);
 
                 return Ok(ToJsonString(question));
@@ -54,12 +53,12 @@ namespace CodeFactoryAPI.Controllers
             {
                 await ex.LogAsync().ConfigureAwait(false);
                 return NotFound();
-                //return StatusCode(500);
+                //return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutQuestion(Guid id, [FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
+        public async Task<IActionResult> PutQuestion(Guid id, [FromForm][ModelBinder(binderType: typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
         {
             if (id != question.Question_ID)
                 return BadRequest();
@@ -70,7 +69,7 @@ namespace CodeFactoryAPI.Controllers
                     if (files is not null && files.Length > 0)
                     {
                         if (files.Length > 5)
-                            return BadRequest();
+                            return StatusCode((int)HttpStatusCode.NotAcceptable, "Only 5 Images is allowed");
 
                         foreach (var file in files)
                         {
@@ -81,17 +80,23 @@ namespace CodeFactoryAPI.Controllers
                             {
                                 IsImage = file.Length > 51200 && file.Length < 1073741825;
 
-                                if (!IsImage) return StatusCode(406, "Image size must be between 50 KB to 1 MB");
+                                if (!IsImage) return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
                             }
-                            else return StatusCode(415, "Select valid Image");
+                            else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
                         }
 
                         await question.SetColumnsWithImages(files);
                     }
 
-                    unit.GetQuestion.context.Attach(question);
-                    unit.GetQuestion.context.Entry(question)
-                       .SetUpdatedColumns("Title", "Code", "Image", "Image2", "Image3", "Image4", "Image5", "Description");
+                    (await unit.GetQuestion.Model
+                                       .AsNoTracking()
+                                       .FirstOneAsync(x => x.Question_ID == id)
+                                       .ConfigureAwait(false))
+                                       .DeleteImages();
+
+                    unit.GetQuestion.Context.Attach(question);
+                    unit.GetQuestion.Context.Entry(question)
+                       .SetUpdatedColumns("Title", "Code", "Image1", "Image2", "Image3", "Image4", "Image5", "Description", "Tag1_ID", "Tag2_ID", "Tag3_ID", "Tag4_ID", "Tag5_ID");
 
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
                         return NoContent();
@@ -113,7 +118,7 @@ namespace CodeFactoryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostQuestion([FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
+        public async Task<IActionResult> PostQuestion([FromForm][ModelBinder(binderType: typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
         {
             try
             {

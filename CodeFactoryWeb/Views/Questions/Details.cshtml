@@ -1,4 +1,4 @@
-﻿@model Models.Model.Question
+﻿@model CodeFactoryAPI.Models.Question
 
 @{
     ViewData["Title"] = "Details";
@@ -23,10 +23,10 @@
             @Html.DisplayFor(model => model.Code)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
+            @Html.DisplayNameFor(model => model.Image1)
         </dt>
         <dd class="col-sm-10">
-            <img src="@GetImage(Model.Image)" height="25" width="25" alt="" />
+            <img src="@GetImage(Model.Image1)" height="25" width="25" alt="" />
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Image2)

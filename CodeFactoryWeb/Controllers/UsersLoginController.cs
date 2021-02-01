@@ -1,6 +1,6 @@
-﻿using Extra;
+﻿using CodeFactoryWeb.Extra;
 using Microsoft.AspNetCore.Mvc;
-using Models.Model;
+using CodeFactoryAPI.Models;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;

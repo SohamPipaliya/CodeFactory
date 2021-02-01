@@ -25,13 +25,10 @@
     ".NETCoreApp,Version=v5.0": {
       "CodeFactoryAPI/1.0.0": {
         "dependencies": {
-          "DAL": "1.0.0",
-          "Extra": "1.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.2",
           "Microsoft.EntityFrameworkCore.Sqlite": "5.0.2",
           "Microsoft.EntityFrameworkCore.Tools": "5.0.2",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "5.0.1",
-          "Models": "1.0.0",
           "Swashbuckle.AspNetCore": "5.6.3",
           "Utf8Json": "1.3.7",
           "Microsoft.AspNetCore.Antiforgery": "5.0.0.0",
@@ -2062,43 +2059,6 @@
         },
         "compile": {
           "lib/netstandard2.0/Utf8Json.dll": {}
-        }
-      },
-      "DAL/1.0.0": {
-        "dependencies": {
-          "Extra": "1.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "5.0.2",
-          "Microsoft.EntityFrameworkCore.Sqlite": "5.0.2",
-          "Models": "1.0.0",
-          "Utf8Json": "1.3.7"
-        },
-        "runtime": {
-          "DAL.dll": {}
-        },
-        "compile": {
-          "DAL.dll": {}
-        }
-      },
-      "Extra/1.0.0": {
-        "dependencies": {
-          "Utf8Json": "1.3.7"
-        },
-        "runtime": {
-          "Extra.dll": {}
-        },
-        "compile": {
-          "Extra.dll": {}
-        }
-      },
-      "Models/1.0.0": {
-        "dependencies": {
-          "Extra": "1.0.0"
-        },
-        "runtime": {
-          "Models.dll": {}
-        },
-        "compile": {
-          "Models.dll": {}
         }
       },
       "Microsoft.AspNetCore.Antiforgery/5.0.0.0": {
@@ -4781,21 +4741,6 @@
       "sha512": "sha512-lMTNZWp6a6KGkgMc3rW41D3b0REb03fQycfb/2bNBpiUtsbGYYI/LrAhnX52vrHRe4ze7JxbtpWF1Y5ohdpipQ==",
       "path": "utf8json/1.3.7",
       "hashPath": "utf8json.1.3.7.nupkg.sha512"
-    },
-    "DAL/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Extra/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Models/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     },
     "Microsoft.AspNetCore.Antiforgery/5.0.0.0": {
       "type": "referenceassembly",

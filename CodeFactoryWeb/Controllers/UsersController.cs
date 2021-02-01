@@ -1,14 +1,13 @@
-﻿using Extra;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models.Model;
+using CodeFactoryAPI.Models;
+using CodeFactoryWeb.Extra;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static Extra.Addons;
 
 namespace CodeFactoryWeb.Controllers
 {
@@ -17,7 +16,7 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public UsersController() =>
-            client = new() { BaseAddress = HostUrl };
+            client = new() { BaseAddress = Addons.HostUrl };
 
         public async Task<ActionResult> Index() =>
              View(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI));

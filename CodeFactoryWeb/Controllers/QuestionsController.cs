@@ -1,8 +1,8 @@
-﻿using Extra;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Models.Model;
+using CodeFactoryAPI.Models;
+using CodeFactoryWeb.Extra;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,9 +67,9 @@ namespace CodeFactoryWeb.Controllers
                         using var responseContent = response.Content;
 
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync());
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(question.Image), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync());
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -140,9 +140,9 @@ namespace CodeFactoryWeb.Controllers
                         using var responsecontent = response.Content;
 
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image), await responsecontent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync());
                         else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image), await responsecontent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync());
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }

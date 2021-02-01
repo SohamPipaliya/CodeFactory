@@ -12,8 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Extra\Extra.csproj" />
-		<ProjectReference Include="..\Models\Models.csproj" />
+		<ProjectReference Include="..\CodeFactoryAPI\CodeFactoryAPI.csproj" />
 	</ItemGroup>
 
 </Project>
