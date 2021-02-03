@@ -76,7 +76,7 @@ namespace CodeFactoryWeb.Extra
     public enum APIName
     {
         QuestionsAPI,
-        UserLoginAPI,
+        TagsAPI,
         UsersAPI
     }
 }

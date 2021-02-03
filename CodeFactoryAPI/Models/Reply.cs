@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeFactoryAPI.Models
 {
-    [Table("Reply")]
+    [Table("Replies")]
     public class Reply
     {
         [Key]
@@ -28,12 +28,12 @@ namespace CodeFactoryAPI.Models
         [DataType(DataType.ImageUrl)]
         public string? Image5 { get; set; }
 
-        public Guid User_ID { get; set; }
-
-        public Guid Question_ID { get; set; }
+        public Guid? User_ID { get; set; }
 
         [ForeignKey("User_ID")]
         public User? User { get; set; }
+
+        public Guid Question_ID { get; set; }
 
         [ForeignKey("Question_ID")]
         public Question? Question { get; set; }

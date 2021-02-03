@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeFactoryAPI.Models
 {
-    [Table("Message")]
+    [Table("Messages")]
     public class Message
     {
         public Guid Message_ID { get; set; }

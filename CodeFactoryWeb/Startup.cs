@@ -42,7 +42,7 @@ namespace CodeFactoryWeb
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Users}/{action=Index}/{id?}");
+                    pattern: "{controller=Questions}/{action=Index}/{id?}");
             });
         }
     }

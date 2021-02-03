@@ -20,16 +20,16 @@ namespace CodeFactoryAPI.DAL
             this.context = context;
 
         public Repository<User> GetUser =>
-            userRepo ??= new(context);
+            userRepo ??= context;
 
         public Repository<Question> GetQuestion =>
-            questRepo ??= new(context);
+            questRepo ??= context;
 
         public Repository<Reply> GetReply =>
-            replyRepo ??= new(context);
+            replyRepo ??= context;
 
         public Repository<Tag> GetTag =>
-            tagRepo ??= new(context);
+            tagRepo ??= context;
         #endregion
 
         public int Save() =>
@@ -64,5 +64,7 @@ namespace CodeFactoryAPI.DAL
                 disposed = true;
             }
         }
+
+        public static implicit operator UnitOfWork(Context context) => new(context);
     }
 }

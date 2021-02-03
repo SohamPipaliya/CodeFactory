@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CodeFactoryAPI.Models;
+using CodeFactoryWeb.Extra;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using CodeFactoryAPI.Models;
-using CodeFactoryWeb.Extra;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,14 +20,14 @@ namespace CodeFactoryWeb.Controllers
             client = new() { BaseAddress = Addons.HostUrl };
 
         public async Task<IActionResult> Index() =>
-              View(await client.GetDataAsync<IEnumerable<Question>>(APIName.QuestionsAPI));
+              View(await client.GetDataAsync<IEnumerable<Question>>(APIName.QuestionsAPI).ConfigureAwait(false));
 
         public async Task<IActionResult> Details(Guid? id) =>
-             View(await client.GetDataAsync<Question>(APIName.QuestionsAPI, id));
+             View(await client.GetDataAsync<Question>(APIName.QuestionsAPI, id).ConfigureAwait(false));
 
         public async Task<IActionResult> Create()
         {
-            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email");
+            await SetViewBag().ConfigureAwait(false);
             return View();
         }
 
@@ -37,12 +37,12 @@ namespace CodeFactoryWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<Stream> streams = null;
-                List<StreamContent> streamContents = null;
+                List<Stream>? streams = null;
+                List<StreamContent>? streamContents = null;
                 try
                 {
                     using var data = new MultipartFormDataContent();
-                    using var stringContent = await question.ParseToStringContentAsync();
+                    using var stringContent = await question.ParseToStringContentAsync().ConfigureAwait(false);
                     data.Add(stringContent, "question");
 
                     if (files is not null && files.Length > 0)
@@ -58,18 +58,17 @@ namespace CodeFactoryWeb.Controllers
                         }
                     }
 
-                    using var response = await client.PostAsync("QuestionsAPI", data);
+                    using var response = await client.PostAsync("QuestionsAPI", data).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
                     {
-                        var msg = response.ToString();
                         using var responseContent = response.Content;
 
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -84,24 +83,18 @@ namespace CodeFactoryWeb.Controllers
                     streamContents?.ForEachDispose();
                 }
             }
-
-            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email");
-
+            await SetViewBag().ConfigureAwait(false);
             return View(question);
         }
 
         public async Task<IActionResult> Edit(Guid? id)
         {
-            var question = await client.GetDataAsync<Question>(APIName.QuestionsAPI, id);
+            var question = await client.GetDataAsync<Question>(APIName.QuestionsAPI, id).ConfigureAwait(false);
+            if (question is null) return NotFound();
 
-            if (question is null)
-                return NotFound();
-
-            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email", question.User_ID);
-
+            await SetViewBag().ConfigureAwait(false);
             return View(question);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -111,12 +104,12 @@ namespace CodeFactoryWeb.Controllers
                 return NotFound();
             if (ModelState.IsValid)
             {
-                List<Stream> streams = null;
-                List<StreamContent> streamContents = null;
+                List<Stream>? streams = null;
+                List<StreamContent>? streamContents = null;
                 try
                 {
                     using var data = new MultipartFormDataContent();
-                    using var stringContent = await question.ParseToStringContentAsync();
+                    using var stringContent = await question.ParseToStringContentAsync().ConfigureAwait(false);
                     data.Add(stringContent, "question");
 
                     if (files is not null && files.Length > 0)
@@ -132,7 +125,7 @@ namespace CodeFactoryWeb.Controllers
                         }
                     }
 
-                    using var response = await client.PutAsync("QuestionsAPI/" + id, data);
+                    using var response = await client.PutAsync("QuestionsAPI/" + id, data).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
@@ -140,9 +133,9 @@ namespace CodeFactoryWeb.Controllers
                         using var responsecontent = response.Content;
 
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(question.Image1), await responsecontent.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -156,16 +149,13 @@ namespace CodeFactoryWeb.Controllers
                     streams?.ForEachDispose();
                     streamContents?.ForEachDispose();
                 }
-                return View(question);
             }
-
-            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email", question.User_ID);
-
+            await SetViewBag().ConfigureAwait(false);
             return View(question);
         }
 
         public async Task<IActionResult> Delete(Guid? id) =>
-             View(await client.GetDataAsync<Question>(APIName.QuestionsAPI, id));
+             View(await client.GetDataAsync<Question>(APIName.QuestionsAPI, id).ConfigureAwait(false));
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -173,7 +163,7 @@ namespace CodeFactoryWeb.Controllers
         {
             try
             {
-                using var response = await client.DeleteAsync("QuestionsAPI/" + id);
+                using var response = await client.DeleteAsync("QuestionsAPI/" + id).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                     return RedirectToAction(nameof(Index));
             }
@@ -182,6 +172,12 @@ namespace CodeFactoryWeb.Controllers
                 ModelState.AddModelError("", "Something went wrong");
             }
             return View();
+        }
+
+        private async Task SetViewBag()
+        {
+            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI).ConfigureAwait(false), "User_ID", "Email");
+            ViewData["Tag_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI).ConfigureAwait(false), "Tag_ID", "Name");
         }
 
         protected override void Dispose(bool disposing)

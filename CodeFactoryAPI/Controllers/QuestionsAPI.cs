@@ -1,13 +1,13 @@
-﻿using CodeFactoryAPI.Extra;
+﻿using CodeFactoryAPI.DAL;
+using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CodeFactoryAPI.Models;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 using static Utf8Json.JsonSerializer;
-using CodeFactoryAPI.DAL;
 
 namespace CodeFactoryAPI.Controllers
 {
@@ -24,6 +24,11 @@ namespace CodeFactoryAPI.Controllers
         public async Task<IActionResult> Getquestions() =>
                 Ok(ToJsonString(await unit.GetQuestion.Model
                     .Include(x => x.User)
+                    .Include(x => x.Tag1)
+                    .Include(x => x.Tag2)
+                    .Include(x => x.Tag3)
+                    .Include(x => x.Tag4)
+                    .Include(x => x.Tag5)
                     .SetMetaDataAsync(x => x.User.Password = null,
                                       x => x.User.RegistrationDate = null)
                     .ConfigureAwait(false)));
@@ -37,7 +42,7 @@ namespace CodeFactoryAPI.Controllers
                                          .FirstOneAsync(x => x.Question_ID == id)
                                          .ConfigureAwait(false);
 
-                if (question == null)
+                if (question is null)
                     return NotFound();
 
                 question.User = await (await unit.GetUser.Model
@@ -46,6 +51,29 @@ namespace CodeFactoryAPI.Controllers
                                          .SetMetaDataAsync(x => x.Password = null,
                                                            x => x.RegistrationDate = null)
                                          .ConfigureAwait(false);
+
+                question.Tag1 = await unit.GetTag.Model
+                                         .FirstOneAsync(x => x.Tag_ID == question.Tag1_ID)
+                                         .ConfigureAwait(false);
+
+                question.Tag2 = await unit.GetTag.Model
+                                         .FirstOneAsync(x => x.Tag_ID == question.Tag2_ID)
+                                         .ConfigureAwait(false);
+
+                if (question.Tag3_ID is not null)
+                    question.Tag3 = await unit.GetTag.Model
+                                             .FirstOneAsync(x => x.Tag_ID == question.Tag3_ID)
+                                             .ConfigureAwait(false);
+
+                if (question.Tag4_ID is not null)
+                    question.Tag4 = await unit.GetTag.Model
+                                         .FirstOneAsync(x => x.Tag_ID == question.Tag4_ID)
+                                         .ConfigureAwait(false);
+
+                if (question.Tag5_ID is not null)
+                    question.Tag5 = await unit.GetTag.Model
+                                             .FirstOneAsync(x => x.Tag_ID == question.Tag5_ID)
+                                             .ConfigureAwait(false);
 
                 return Ok(ToJsonString(question));
             }
@@ -96,7 +124,10 @@ namespace CodeFactoryAPI.Controllers
 
                     unit.GetQuestion.Context.Attach(question);
                     unit.GetQuestion.Context.Entry(question)
-                       .SetUpdatedColumns("Title", "Code", "Image1", "Image2", "Image3", "Image4", "Image5", "Description", "Tag1_ID", "Tag2_ID", "Tag3_ID", "Tag4_ID", "Tag5_ID");
+                       .SetUpdatedColumns(nameof(question.Title), nameof(question.Code), nameof(question.Image1), nameof(question.Image2),
+                                          nameof(question.Image3), nameof(question.Image4), nameof(question.Image5), nameof(question.Description),
+                                          nameof(question.Tag1_ID), nameof(question.Tag2_ID), nameof(question.Tag3_ID), nameof(question.Tag4_ID),
+                                          nameof(question.Tag5_ID));
 
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
                         return NoContent();

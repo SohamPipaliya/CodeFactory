@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,11 +8,9 @@ namespace CodeFactoryAPI.Models
     public class Tag
     {
         [Key]
-        public int Tag_ID { get; set; }
+        public Guid Tag_ID { get; set; }
 
         [Required]
         public string Name { get; set; }
-
-        public IList<UsersTags> UsersTags { get; set; }
     }
 }

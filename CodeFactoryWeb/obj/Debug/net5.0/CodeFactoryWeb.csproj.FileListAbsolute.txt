@@ -466,3 +466,9 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFacto
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\ref\CodeFactoryWeb.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.pdb
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.genruntimeconfig.cache
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Index.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Details.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Edit.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Delete.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Create.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryWeb.StaticWebAssets.xml

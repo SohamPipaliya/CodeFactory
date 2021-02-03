@@ -28,11 +28,28 @@
             </div>
             <div class="form-group">
                 <label class="control-label">User</label>
-                <select asp-for="User_ID" class="form-control" asp-items="ViewBag.User_ID" required></select>
+                @Html.DropDownList("User_ID", ViewBag.User_ID as SelectList, "Select User", new { @class = "form-control" })
                 <span asp-validation-for="User_ID" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image1" class="control-label"></label>
+                <label class="control-label">Tags</label>
+                @Html.DropDownList("Tag1_ID", ViewBag.Tag_ID as SelectList, "Select Tag", new { @class = "form-control" })
+                <span asp-validation-for="Tag1_ID" class="text-danger"></span>
+                <br />
+                @Html.DropDownList("Tag2_ID", ViewBag.Tag_ID as SelectList, "Select Tag", new { @class = "form-control" })
+                <span asp-validation-for="Tag2_ID" class="text-danger"></span>
+                <br />
+                @Html.DropDownList("Tag3_ID", ViewBag.Tag_ID as SelectList, "Select Tag", new { @class = "form-control" })
+                <span asp-validation-for="Tag3_ID" class="text-danger"></span>
+                <br />
+                @Html.DropDownList("Tag4_ID", ViewBag.Tag_ID as SelectList, "Select Tag", new { @class = "form-control" })
+                <span asp-validation-for="Tag4_ID" class="text-danger"></span>
+                <br />
+                @Html.DropDownList("Tag5_ID", ViewBag.Tag_ID as SelectList, "Select Tag", new { @class = "form-control" })
+                <span asp-validation-for="Tag5_ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Images</label>
                 <input type="file" class="custom-file" name="files" multiple />
                 <span asp-validation-for="Image1" class="text-danger"></span>
             </div>

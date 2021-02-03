@@ -67,5 +67,7 @@ namespace CodeFactoryAPI.DAL
             model = null;
             GC.SuppressFinalize(this);
         }
+
+        public static implicit operator Repository<T>(Context context) => new(context);
     }
 }
