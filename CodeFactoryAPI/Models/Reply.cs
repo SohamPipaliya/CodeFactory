@@ -28,7 +28,7 @@ namespace CodeFactoryAPI.Models
         [DataType(DataType.ImageUrl)]
         public string? Image5 { get; set; }
 
-        public Guid? User_ID { get; set; }
+        public Guid User_ID { get; set; }
 
         [ForeignKey("User_ID")]
         public User? User { get; set; }

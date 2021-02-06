@@ -153,6 +153,21 @@ namespace CodeFactoryAPI.Extra
             return data;
         });
 
+        public static IEnumerable<T> SetMetaData<T>(this IEnumerable<T> data, params Action<T>[] actions) where T : class
+        {
+            if (data is null)
+                throw new NullReferenceException();
+
+            foreach (var item in data)
+                foreach (var action in actions)
+                    action(item);
+
+            return data;
+        }
+
+        public static void SetUserState(this User user) =>
+            (user.Password, user.RegistrationDate) = (null, null);
+
         public static Task<T> SetMetaDataAsync<T>(this T data, params Action<T>[] actions)
             where T : class => Task.Run(() =>
         {
@@ -201,17 +216,6 @@ namespace CodeFactoryAPI.Extra
                     Delete(path);
             }
         }
-        #endregion
-
-        #region SingleRecord
-        public static Task<T?> FirstOneAsync<T>(this IEnumerable<T> data, Predicate<T> predicate) where T : class => Task.Run(() =>
-        {
-            foreach (var item in data)
-                if (predicate(item))
-                    return item;
-
-            return null;
-        });
         #endregion
 
         #region LogException

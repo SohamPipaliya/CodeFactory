@@ -26,8 +26,15 @@ using static CodeFactoryWeb.Extra.Addons;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 3 "C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Views\_ViewImports.cshtml"
+using CodeFactoryWeb.Extra;
+
+#line default
+#line hidden
+#nullable disable
     [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"4dc40f3eb20702562950c6ddc2bd51c2ea8d8d94", @"/Views/Questions/Index.cshtml")]
-    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"f543f12f3617776d6d75d58479ed0202d4588165", @"/Views/_ViewImports.cshtml")]
+    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"cffc283eec59fb9ba499a775de41425547b65ab2", @"/Views/_ViewImports.cshtml")]
     public class Views_Questions_Index : global::Microsoft.AspNetCore.Mvc.Razor.RazorPage<IEnumerable<CodeFactoryAPI.Models.Question>>
     {
         private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_0 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("asp-action", "Create", global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeValueStyle.DoubleQuotes);
@@ -68,7 +75,7 @@ using static CodeFactoryWeb.Extra.Addons;
 #line hidden
 #nullable disable
             WriteLiteral("\r\n<h1>Index</h1>\r\n\r\n<p>\r\n    ");
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d944615", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d944804", async() => {
                 WriteLiteral("Create New");
             }
             );
@@ -142,7 +149,7 @@ using static CodeFactoryWeb.Extra.Addons;
 #line hidden
 #nullable disable
             WriteLiteral("\r\n            </td>\r\n            <td>\r\n                ");
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d948171", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d948360", async() => {
                 WriteLiteral("Edit");
             }
             );
@@ -173,7 +180,7 @@ using static CodeFactoryWeb.Extra.Addons;
             Write(__tagHelperExecutionContext.Output);
             __tagHelperExecutionContext = __tagHelperScopeManager.End();
             WriteLiteral(" |\r\n                ");
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d9410348", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d9410537", async() => {
                 WriteLiteral("Details");
             }
             );
@@ -204,7 +211,7 @@ using static CodeFactoryWeb.Extra.Addons;
             Write(__tagHelperExecutionContext.Output);
             __tagHelperExecutionContext = __tagHelperScopeManager.End();
             WriteLiteral(" |\r\n                ");
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d9412532", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4dc40f3eb20702562950c6ddc2bd51c2ea8d8d9412721", async() => {
                 WriteLiteral("Delete");
             }
             );

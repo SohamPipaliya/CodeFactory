@@ -11,6 +11,7 @@ namespace CodeFactoryAPI.DAL
         private Repository<Question> questRepo;
         private Repository<Reply> replyRepo;
         private Repository<Tag> tagRepo;
+        private Repository<Message> messageRepo;
         private Context context;
         private bool disposed = false;
         #endregion
@@ -30,6 +31,9 @@ namespace CodeFactoryAPI.DAL
 
         public Repository<Tag> GetTag =>
             tagRepo ??= context;
+
+        public Repository<Message> GetMessage =>
+            messageRepo ??= context;
         #endregion
 
         public int Save() =>

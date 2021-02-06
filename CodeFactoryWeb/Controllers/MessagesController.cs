@@ -10,40 +10,42 @@ using System.Threading.Tasks;
 
 namespace CodeFactoryWeb.Controllers
 {
-    public class TagsController : Controller
+    public class MessagesController : Controller
     {
         private HttpClient client;
 
-        public TagsController() =>
+        public MessagesController() =>
             client = new() { BaseAddress = Addons.HostUrl };
 
         public async Task<IActionResult> Index() =>
-            View(await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI));
+             View(await client.GetDataAsync<IEnumerable<Message>>(APIName.MessagesAPI));
 
         public async Task<IActionResult> Details(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
-
-        public async Task<IActionResult> Edit(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
+            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
 
         public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
+            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
 
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            await SetViewBag();
+            return View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
+        }
         public async Task<IActionResult> Create()
         {
-            ViewData["Tag_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI), "Tag_ID", "Name");
+            await SetViewBag();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Tag tag)
+        public async Task<IActionResult> Create(Message message)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    using var response = await client.PostAsJsonAsync("TagsAPI", tag);
+                    using var response = await client.PostAsJsonAsync("MessagesAPI", message);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
@@ -52,18 +54,19 @@ namespace CodeFactoryWeb.Controllers
                     await ex.LogAsync();
                 }
             }
-            return View(tag);
+            await SetViewBag();
+            return View(message);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Tag tag)
+        public async Task<IActionResult> Edit(Guid id, Message message)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    using var response = await client.PutAsJsonAsync("TagsAPI/" + id, tag);
+                    using var response = await client.PutAsJsonAsync("MessagesAPI/" + id, message);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
@@ -72,7 +75,8 @@ namespace CodeFactoryWeb.Controllers
                     await ex.LogAsync();
                 }
             }
-            return View(tag);
+            await SetViewBag();
+            return View(message);
         }
 
         [HttpPost, ActionName(nameof(Delete))]
@@ -83,7 +87,7 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.DeleteAsync("TagsAPI/" + id);
+                    using var response = await client.DeleteAsync("MessagesAPI/" + id);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
@@ -93,6 +97,12 @@ namespace CodeFactoryWeb.Controllers
                 }
             }
             return View();
+        }
+
+        private async Task SetViewBag()
+        {
+            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email");
+            ViewData["Question_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Question>>(APIName.QuestionsAPI), "Question_ID", "Title");
         }
 
         protected override void Dispose(bool disposing)

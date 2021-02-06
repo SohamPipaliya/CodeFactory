@@ -42,7 +42,9 @@ namespace CodeFactoryWeb.Controllers
         protected override void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 client?.Dispose();
+            }
             client = null;
             GC.SuppressFinalize(this);
             base.Dispose(disposing);

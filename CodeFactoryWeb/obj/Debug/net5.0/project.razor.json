@@ -15638,8 +15638,28 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Index.cshtml",
+      "TargetPath": "Views\\Tags\\Index.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Details.cshtml",
+      "TargetPath": "Views\\Tags\\Details.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Edit.cshtml",
+      "TargetPath": "Views\\Tags\\Edit.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Users\\Details.cshtml",
       "TargetPath": "Views\\Users\\Details.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Delete.cshtml",
+      "TargetPath": "Views\\Tags\\Delete.cshtml",
       "FileKind": "mvc"
     },
     {
@@ -15675,6 +15695,11 @@
     {
       "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\_ViewStart.cshtml",
       "TargetPath": "Views\\_ViewStart.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Create.cshtml",
+      "TargetPath": "Views\\Tags\\Create.cshtml",
       "FileKind": "mvc"
     }
   ],

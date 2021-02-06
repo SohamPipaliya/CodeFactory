@@ -46,8 +46,8 @@ namespace CodeFactoryAPI.Controllers
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    var exist = await unit.GetTag.AnyAsync(x => x.Tag_ID == id);
-                    if (exist)
+                    var exist = await unit.GetTag.FindAsync(id);
+                    if (exist is null)
                         return NotFound();
                     await ex.LogAsync().ConfigureAwait(false);
                     return StatusCode((int)HttpStatusCode.InternalServerError);

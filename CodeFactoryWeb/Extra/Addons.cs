@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -71,12 +73,35 @@ namespace CodeFactoryWeb.Extra
                 item.Dispose();
         }
         #endregion
+
+        #region CustomTagHelper
+        public static IHtmlContent Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
+            new HtmlString($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
+        #endregion
     }
 
     public enum APIName
     {
         QuestionsAPI,
         TagsAPI,
-        UsersAPI
+        UsersAPI,
+        MessagesAPI
+    }
+
+    public enum ControllerName
+    {
+        Messages,
+        Questions,
+        Tags,
+        Users
+    }
+
+    public enum ActionName
+    {
+        Index,
+        Create,
+        Edit,
+        Delete,
+        Details
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using static Utf8Json.JsonSerializer;
@@ -18,70 +19,77 @@ namespace CodeFactoryAPI.Controllers
         private UnitOfWork unit;
 
         public QuestionsAPI(Context context) =>
-            unit = new(context);
+            unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> Getquestions() =>
-                Ok(ToJsonString(await unit.GetQuestion.Model
-                    .Include(x => x.User)
-                    .Include(x => x.Tag1)
-                    .Include(x => x.Tag2)
-                    .Include(x => x.Tag3)
-                    .Include(x => x.Tag4)
-                    .Include(x => x.Tag5)
-                    .SetMetaDataAsync(x => x.User.Password = null,
-                                      x => x.User.RegistrationDate = null)
-                    .ConfigureAwait(false)));
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetQuestion(Guid id)
+        public async Task<IActionResult> Getquestions()
         {
             try
             {
-                var question = await unit.GetQuestion.Model
-                                         .FirstOneAsync(x => x.Question_ID == id)
-                                         .ConfigureAwait(false);
-
-                if (question is null)
-                    return NotFound();
-
-                question.User = await (await unit.GetUser.Model
-                                         .FirstOneAsync(x => x.User_ID == question.User_ID)
-                                         .ConfigureAwait(false))
-                                         .SetMetaDataAsync(x => x.Password = null,
-                                                           x => x.RegistrationDate = null)
-                                         .ConfigureAwait(false);
-
-                question.Tag1 = await unit.GetTag.Model
-                                         .FirstOneAsync(x => x.Tag_ID == question.Tag1_ID)
-                                         .ConfigureAwait(false);
-
-                question.Tag2 = await unit.GetTag.Model
-                                         .FirstOneAsync(x => x.Tag_ID == question.Tag2_ID)
-                                         .ConfigureAwait(false);
-
-                if (question.Tag3_ID is not null)
-                    question.Tag3 = await unit.GetTag.Model
-                                             .FirstOneAsync(x => x.Tag_ID == question.Tag3_ID)
-                                             .ConfigureAwait(false);
-
-                if (question.Tag4_ID is not null)
-                    question.Tag4 = await unit.GetTag.Model
-                                         .FirstOneAsync(x => x.Tag_ID == question.Tag4_ID)
-                                         .ConfigureAwait(false);
-
-                if (question.Tag5_ID is not null)
-                    question.Tag5 = await unit.GetTag.Model
-                                             .FirstOneAsync(x => x.Tag_ID == question.Tag5_ID)
-                                             .ConfigureAwait(false);
-
-                return Ok(ToJsonString(question));
+                return Ok(ToJsonString(await unit.GetQuestion.Model
+                    .Include(question => question.User)
+                    .Include(question => question.Tag1)
+                    .Include(question => question.Tag2)
+                    .Include(question => question.Tag3)
+                    .Include(question => question.Tag4)
+                    .Include(question => question.Tag5)
+                    .Include(question => question.Messages)
+                    .AsParallel()
+                    .SetMetaDataAsync(question => question.User.SetUserState(),
+                                      question => question.Replies = unit.GetReply.Model
+                                                       .Include(reply => reply.User)
+                                                       .AsNoTracking()
+                                                       .Where(reply => reply.Question_ID == question.Question_ID)
+                                                       .ToArray()
+                                                       .SetMetaData(reply => reply.User.SetUserState()),
+                                      question => question.Messages = unit.GetMessage.Model
+                                                       .Include(message => message.User)
+                                                       .AsNoTracking()
+                                                       .Where(message => message.Question_ID == question.Question_ID)
+                                                       .ToArray()
+                                                       .SetMetaData(message => message.User.SetUserState()))
+                    .ConfigureAwait(false)));
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
-                return NotFound();
-                //return StatusCode((int)HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetQuestion(Guid id)
+        {
+            try
+            {
+                return Ok(ToJsonString(await (await unit.GetQuestion.Model
+                    .Include(question => question.User)
+                    .Include(question => question.Tag1)
+                    .Include(question => question.Tag2)
+                    .Include(question => question.Tag3)
+                    .Include(question => question.Tag4)
+                    .Include(question => question.Tag5)
+                    .FirstAsync(question => question.Question_ID == id)
+                    .ConfigureAwait(false))
+                    .SetMetaDataAsync(question => question.User.SetUserState(),
+                                      question => question.Replies = unit.GetReply.Model
+                                                       .Include(reply => reply.User)
+                                                       .AsNoTracking()
+                                                       .Where(reply => reply.Question_ID == question.Question_ID)
+                                                       .ToArray()
+                                                       .SetMetaData(reply => reply.User.SetUserState()),
+                                      question => question.Messages = unit.GetMessage.Model
+                                                       .Include(message => message.User)
+                                                       .AsNoTracking()
+                                                       .Where(message => message.Question_ID == question.Question_ID)
+                                                       .ToArray()
+                                                       .SetMetaData(message => message.User.SetUserState()))
+                    .ConfigureAwait(false)));
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -118,7 +126,7 @@ namespace CodeFactoryAPI.Controllers
 
                     (await unit.GetQuestion.Model
                                        .AsNoTracking()
-                                       .FirstOneAsync(x => x.Question_ID == id)
+                                       .FirstAsync(question => question.Question_ID == id)
                                        .ConfigureAwait(false))
                                        .DeleteImages();
 

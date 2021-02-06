@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -61,5 +62,9 @@ namespace CodeFactoryAPI.Models
 
         [ForeignKey("Tag5_ID")]
         public Tag? Tag5 { get; set; }
+
+        public IEnumerable<Reply>? Replies { get; set; }
+
+        public IEnumerable<Message>? Messages { get; set; }
     }
 }

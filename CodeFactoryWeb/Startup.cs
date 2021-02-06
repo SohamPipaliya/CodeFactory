@@ -8,10 +8,8 @@ namespace CodeFactoryWeb
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
+        public Startup(IConfiguration configuration) =>
             Configuration = configuration;
-        }
 
         public IConfiguration Configuration { get; }
 
@@ -42,7 +40,7 @@ namespace CodeFactoryWeb
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Questions}/{action=Index}/{id?}");
+                    pattern: "{controller=Messages}/{action=Index}/{id?}");
             });
         }
     }

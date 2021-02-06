@@ -38,6 +38,6 @@ namespace CodeFactoryAPI.DAL
 
         public DbSet<Reply> Replies { get; set; }
 
-        //public DbSet<UsersTags> UsersTags { get; set; }
+        public DbSet<Message> Message { get; set; }
     }
 }
