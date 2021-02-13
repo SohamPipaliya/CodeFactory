@@ -37,28 +37,10 @@ namespace CodeFactoryWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<Stream>? streams = null;
-                List<StreamContent>? streamContents = null;
                 try
                 {
-                    using var data = new MultipartFormDataContent();
-                    using var stringContent = await question.ParseToStringContentAsync().ConfigureAwait(false);
-                    data.Add(stringContent, "question");
-
-                    if (files is not null && files.Length > 0)
-                    {
-                        streams = new();
-                        streamContents = new();
-
-                        for (int i = 0; i < files.Length; i++)
-                        {
-                            streams.Add(files[i].OpenReadStream());
-                            streamContents.Add(new(streams[i]));
-                            data.Add(streamContents[i], "files", files[i].FileName);
-                        }
-                    }
-
-                    using var response = await client.PostAsync("QuestionsAPI", data).ConfigureAwait(false);
+                    using var response = await client.AsFormDataAsync
+                                                      (APIName.QuestionsAPI, MethodName.PostAsync, question, files).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
@@ -76,11 +58,6 @@ namespace CodeFactoryWeb.Controllers
                 {
                     ModelState.AddModelError("", "Something went wrong");
                     await ex.LogAsync().ConfigureAwait(false);
-                }
-                finally
-                {
-                    streams?.ForEachDispose();
-                    streamContents?.ForEachDispose();
                 }
             }
             await SetViewBag().ConfigureAwait(false);
@@ -104,28 +81,11 @@ namespace CodeFactoryWeb.Controllers
                 return NotFound();
             if (ModelState.IsValid)
             {
-                List<Stream>? streams = null;
-                List<StreamContent>? streamContents = null;
                 try
                 {
-                    using var data = new MultipartFormDataContent();
-                    using var stringContent = await question.ParseToStringContentAsync().ConfigureAwait(false);
-                    data.Add(stringContent, "question");
+                    using var response = await client.AsFormDataAsync
+                                                       (APIName.QuestionsAPI, MethodName.PutAsync, question, files, id).ConfigureAwait(false);
 
-                    if (files is not null && files.Length > 0)
-                    {
-                        streams = new();
-                        streamContents = new();
-
-                        for (int i = 0; i < files.Length; i++)
-                        {
-                            streams.Add(files[i].OpenReadStream());
-                            streamContents.Add(new(streams[i]));
-                            data.Add(streamContents[i], "files", files[i].FileName);
-                        }
-                    }
-
-                    using var response = await client.PutAsync("QuestionsAPI/" + id, data).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
@@ -143,11 +103,6 @@ namespace CodeFactoryWeb.Controllers
                 {
                     ModelState.AddModelError("", "Something went wrong");
                     await ex.LogAsync().ConfigureAwait(false);
-                }
-                finally
-                {
-                    streams?.ForEachDispose();
-                    streamContents?.ForEachDispose();
                 }
             }
             await SetViewBag().ConfigureAwait(false);

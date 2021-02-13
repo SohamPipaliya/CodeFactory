@@ -444,6 +444,11 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\scopedcss
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.TagHelpers.input.cache
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.TagHelpers.output.cache
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.RazorCoreGenerate.cache
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Create.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Delete.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Details.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Edit.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Index.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Questions\Create.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Questions\Delete.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Questions\Details.cshtml.g.cs
@@ -472,8 +477,8 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFacto
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\ref\CodeFactoryWeb.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.pdb
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.genruntimeconfig.cache
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Index.cshtml.g.cs
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Details.cshtml.g.cs
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Edit.cshtml.g.cs
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Create.cshtml.g.cs
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Messages\Delete.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Index.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Create.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Details.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Edit.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Delete.cshtml.g.cs

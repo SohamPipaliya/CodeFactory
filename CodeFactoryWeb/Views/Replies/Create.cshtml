@@ -1,0 +1,51 @@
+﻿@model CodeFactoryAPI.Models.Reply
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Reply</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Message" class="control-label"></label>
+                <input asp-for="Message" class="form-control" />
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Code" class="control-label"></label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">User</label>
+                @Html.DropDownListFor(rpl => rpl.User_ID, ViewBag.User_ID as SelectList, "Select User", new { @class = "form-control" })
+                <span asp-validation-for="User_ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">User</label>
+                @Html.DropDownListFor(rpl => rpl.Question_ID, ViewBag.Question_ID as SelectList, "Select Question", new { @class = "form-control" })
+                <span asp-validation-for="User_ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Images</label>
+                <input type="file" class="custom-file" name="files" multiple />
+                <span asp-validation-for="Image1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

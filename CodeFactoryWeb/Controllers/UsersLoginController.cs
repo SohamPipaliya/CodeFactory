@@ -12,10 +12,9 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public UsersLoginController() =>
-            client = new() { BaseAddress = Extra.Addons.HostUrl };
+            client = new() { BaseAddress = Addons.HostUrl };
 
-        public IActionResult Login() =>
-             View();
+        public IActionResult Login() => View();
 
         [HttpPost]
         public async Task<IActionResult> Login(UserLogin userLogin)
@@ -27,9 +26,10 @@ namespace CodeFactoryWeb.Controllers
                     using var content = await userLogin.ParseToStringContentAsync();
                     using var response = await client.PostAsync("UserLoginAPI", content);
                     if (response.IsSuccessStatusCode)
-                        return RedirectToAction("Index", nameof(UsersController));
-                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        ModelState.AddModelError("", "Invalid Username or password");
+                        return RedirectToAction("Index", nameof(QuestionsController));
+                    //else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    //    ModelState.AddModelError("", "Invalid Username or password");
+                    else ModelState.AddModelError("", "Invalid Username or password");
                 }
             }
             catch

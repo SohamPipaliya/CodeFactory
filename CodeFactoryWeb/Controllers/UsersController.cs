@@ -19,10 +19,10 @@ namespace CodeFactoryWeb.Controllers
             client = new() { BaseAddress = Addons.HostUrl };
 
         public async Task<ActionResult> Index() =>
-             View(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI));
+             View(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI).ConfigureAwait(false));
 
         public async Task<IActionResult> Details(Guid? id) =>
-             View(await client.GetDataAsync<User>(APIName.UsersAPI, id));
+             View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
 
         public IActionResult Create() => View();
 
@@ -37,7 +37,7 @@ namespace CodeFactoryWeb.Controllers
                 try
                 {
                     using var data = new MultipartFormDataContent();
-                    using var stringContent = await user.ParseToStringContentAsync();
+                    using var stringContent = await user.ParseToStringContentAsync().ConfigureAwait(false);
                     data.Add(stringContent, "user");
 
                     if (file is not null)
@@ -47,19 +47,19 @@ namespace CodeFactoryWeb.Controllers
                         data.Add(content, "file", file.FileName);
                     }
 
-                    using var response = await client.PostAsync("UsersAPI", data);
-                    if (response.StatusCode == HttpStatusCode.Created)
+                    using var response = await client.PostAsync("UsersAPI", data).ConfigureAwait(false);
+                    if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
                     {
                         using var responseMessage = response.Content;
 
                         if (response.StatusCode == HttpStatusCode.AlreadyReported)
-                            ModelState.AddModelError(nameof(user.UserName), await responseMessage.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.UserName), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -78,7 +78,7 @@ namespace CodeFactoryWeb.Controllers
         }
 
         public async Task<IActionResult> Edit(Guid? id) =>
-            View(await client.GetDataAsync<User>(APIName.UsersAPI, id));
+            View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -93,7 +93,7 @@ namespace CodeFactoryWeb.Controllers
                 try
                 {
                     using var data = new MultipartFormDataContent();
-                    using var stringContent = await user.ParseToStringContentAsync();
+                    using var stringContent = await user.ParseToStringContentAsync().ConfigureAwait(false);
                     data.Add(stringContent, "user");
 
                     if (file is not null)
@@ -103,20 +103,20 @@ namespace CodeFactoryWeb.Controllers
                         data.Add(content, "file", file.FileName);
                     }
 
-                    using var response = await client.PutAsync("UsersAPI/" + id, data);
-                    if (response.StatusCode == HttpStatusCode.Created)
+                    using var response = await client.PutAsync("UsersAPI/" + id, data).ConfigureAwait(false);
+                    if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
                     {
                         using var responseContent = response.Content;
                         if (response.StatusCode == HttpStatusCode.AlreadyReported)
-                            ModelState.AddModelError(nameof(user.UserName), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.UserName), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.NotFound)
-                            ModelState.AddModelError("", await responseContent.ReadAsStringAsync());
+                            ModelState.AddModelError("", await responseContent.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -134,7 +134,7 @@ namespace CodeFactoryWeb.Controllers
         }
 
         public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<User>(APIName.UsersAPI, id));
+            View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -143,7 +143,7 @@ namespace CodeFactoryWeb.Controllers
         {
             try
             {
-                using (var response = await client.DeleteAsync("UsersAPI/" + id))
+                using (var response = await client.DeleteAsync("UsersAPI/" + id).ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));

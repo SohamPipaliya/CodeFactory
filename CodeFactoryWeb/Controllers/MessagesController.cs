@@ -18,22 +18,22 @@ namespace CodeFactoryWeb.Controllers
             client = new() { BaseAddress = Addons.HostUrl };
 
         public async Task<IActionResult> Index() =>
-             View(await client.GetDataAsync<IEnumerable<Message>>(APIName.MessagesAPI));
+             View(await client.GetDataAsync<IEnumerable<Message>>(APIName.MessagesAPI).ConfigureAwait(false));
 
         public async Task<IActionResult> Details(Guid id) =>
-            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
+            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
 
         public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
+            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            await SetViewBag();
-            return View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id));
+            await SetViewBag().ConfigureAwait(false);
+            return View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
         }
         public async Task<IActionResult> Create()
         {
-            await SetViewBag();
+            await SetViewBag().ConfigureAwait(false);
             return View();
         }
 
@@ -45,16 +45,16 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PostAsJsonAsync("MessagesAPI", message);
+                    using var response = await client.PostAsJsonAsync("MessagesAPI", message).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
-            await SetViewBag();
+            await SetViewBag().ConfigureAwait(false);
             return View(message);
         }
 
@@ -66,16 +66,16 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PutAsJsonAsync("MessagesAPI/" + id, message);
+                    using var response = await client.PutAsJsonAsync("MessagesAPI/" + id, message).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
-            await SetViewBag();
+            await SetViewBag().ConfigureAwait(false);
             return View(message);
         }
 
@@ -87,13 +87,13 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.DeleteAsync("MessagesAPI/" + id);
+                    using var response = await client.DeleteAsync("MessagesAPI/" + id).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
             return View();
@@ -101,8 +101,8 @@ namespace CodeFactoryWeb.Controllers
 
         private async Task SetViewBag()
         {
-            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI), "User_ID", "Email");
-            ViewData["Question_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Question>>(APIName.QuestionsAPI), "Question_ID", "Title");
+            ViewData["User_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI).ConfigureAwait(false), "User_ID", "Email");
+            ViewData["Question_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Question>>(APIName.QuestionsAPI).ConfigureAwait(false), "Question_ID", "Title");
         }
 
         protected override void Dispose(bool disposing)

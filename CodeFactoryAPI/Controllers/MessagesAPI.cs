@@ -4,17 +4,17 @@ using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
-using static Utf8Json.JsonSerializer;
+using static CodeFactoryAPI.Extra.Addons;
 
 namespace CodeFactoryAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MessagesAPI : ControllerBase
+    public class MessagesAPI : ControllerBase, IDisposable
     {
         private UnitOfWork unit;
 
@@ -22,15 +22,17 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetMessage()
+        public async Task<IActionResult> GetMessages()
         {
             try
             {
-                return Ok(ToJsonString(await unit.GetMessage.Model
-                                                 .Include(message => message.User)
-                                                 .OrderBy(message => message.Messages)
-                                                 .SetMetaDataAsync(message => message.User.SetUserState())
-                                                 .ConfigureAwait(false)));
+                return Ok(SerializeToJson<IEnumerable<Message>>(/*await*/ unit.GetMessage.Model
+                                                                   //.Include(message => message.Messeger)
+                                                                   //.Include(message => message.Receiver)
+                                                                   .OrderBy(message => message.Messages)));
+                //.SetMetaDataAsync(message => message.Messeger.SetUserState(),
+                //                  message => message.Receiver.SetUserState())
+                //.ConfigureAwait(false)));
             }
             catch (Exception ex)
             {
@@ -44,22 +46,23 @@ namespace CodeFactoryAPI.Controllers
         {
             try
             {
-                return Ok(ToJsonString(await
-                                      (await unit.GetMessage.Model
-                                                 .Include(message => message.User)
-                                                 .FirstAsync(message => message.Message_ID == id)
-                                                 .ConfigureAwait(false))
-                                                 .SetMetaDataAsync(message => message.User.SetUserState())
-                                                 .ConfigureAwait(false)));
+                return Ok(SerializeToJson<Message>(await /*(await */unit.GetMessage.Model
+                                                                 //.Include(message => message.Messeger)
+                                                                 //.Include(message => message.Receiver)
+                                                                 .FirstAsync(message => message.Message_ID == id)
+                                                                 .ConfigureAwait(false)));
+                //.SetMetaDataAsync(message => message.Messeger.SetUserState(),
+                //                  message => message.Receiver.SetUserState())
+                //.ConfigureAwait(false)));
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutMessage(Guid id, Message message)
         {
             if (id != message.Message_ID)
@@ -68,12 +71,14 @@ namespace CodeFactoryAPI.Controllers
             {
                 try
                 {
+                    message.Messages = await message.Messages.FilterStringAsync().ConfigureAwait(false);
+
                     unit.GetMessage.Context.Attach(message);
                     unit.GetUser.Context.Entry(message)
                         .SetUpdatedColumns(nameof(message.Messages));
 
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return NoContent();
+                        return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -94,9 +99,11 @@ namespace CodeFactoryAPI.Controllers
             {
                 try
                 {
+                    message.Messages = await message.Messages.FilterStringAsync().ConfigureAwait(false);
+
                     unit.GetMessage.Add(message);
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return NoContent();
+                        return Ok();
                 }
                 catch (Exception ex)
                 {
@@ -107,14 +114,14 @@ namespace CodeFactoryAPI.Controllers
             else return BadRequest();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteMessage(Guid id)
         {
             try
             {
-                await unit.GetMessage.RemoveAsync(id);
+                await unit.GetMessage.RemoveAsync(id).ConfigureAwait(false);
                 if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                    return NoContent();
+                    return Ok();
             }
             catch (Exception ex)
             {
@@ -122,5 +129,29 @@ namespace CodeFactoryAPI.Controllers
             }
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
+
+        #region Dispose
+        private bool disposed = false;
+
+        [NonAction]
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    unit?.Dispose();
+                }
+                unit = null;
+                disposed = true;
+            }
+        }
+        #endregion
     }
 }

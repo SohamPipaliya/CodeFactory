@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using static CodeFactoryAPI.Extra.Addons;
 using static System.IO.File;
-using static Utf8Json.JsonSerializer;
 
 namespace CodeFactoryAPI.Controllers
 {
@@ -21,28 +21,40 @@ namespace CodeFactoryAPI.Controllers
         private UnitOfWork unit;
 
         public UsersAPI(Context context) =>
-            unit = new(context);
+            unit = context;
 
         [HttpGet]
-        public IActionResult Get() =>
-           Ok(ToJsonString(unit.GetUser.GetAll()));
-
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> GetUsers()
         {
             try
             {
-                var user = await unit.GetUser.FindAsync(id).ConfigureAwait(false);
-                return user == null ? NotFound() : Ok(ToJsonString(user));
+                var json = SerializeToJson<IEnumerable<User>>(unit.GetUser.Model);
+                return Ok(json);
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound();
+                await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetUser(Guid id)
+        {
+            try
+            {
+                var user = await unit.GetUser.FindAsync(user => user.User_ID == id).ConfigureAwait(false);
+                return user == null ? NotFound() : Ok(SerializeToJson<User>(user));
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] User user, IFormFile? file)
+        public async Task<IActionResult> PostUser([FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -79,7 +91,7 @@ namespace CodeFactoryAPI.Controllers
 
                     unit.GetUser.Add(user);
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return StatusCode((int)HttpStatusCode.Created);
+                        return Ok();
                 }
                 catch (Exception ex)
                 {
@@ -87,14 +99,16 @@ namespace CodeFactoryAPI.Controllers
                 }
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return BadRequest();
+            else return BadRequest();
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Put(Guid id, [FromForm][ModelBinder(BinderType = typeof(FormDataModelBinder))] User user, IFormFile? file)
+        public async Task<IActionResult> PutUser(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
         {
-            if (id != user.User_ID) return BadRequest();
-            else if (ModelState.IsValid)
+            if (id != user.User_ID)
+                return BadRequest();
+
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -144,10 +158,10 @@ namespace CodeFactoryAPI.Controllers
                 catch (Exception ex)
                 {
                     var model = await unit.GetUser
-                                        .FindAsync(id)
-                                        .ConfigureAwait(false);
+                                          .FindAsync(user => user.User_ID == id)
+                                          .ConfigureAwait(false);
                     if (model is null)
-                        return NotFound("No user found");
+                        return NotFound();
                     else if (user.UserName == model.UserName)
                         return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
@@ -163,26 +177,26 @@ namespace CodeFactoryAPI.Controllers
         {
             try
             {
-                var model = await unit.GetUser.RemoveAsync(id);
+                var user = await unit.GetUser.FindAsync(user => user.User_ID == id)
+                                             .ConfigureAwait(false);
+                if (user is null)
+                    return NotFound();
 
-                if (model?.Entity.Image is not null)
-                {
-                    var path = ImagePath(model.Entity.Image);
-                    if (Exists(path))
-                        System.IO.File.Delete(path);
-                }
+                unit.GetUser.Remove(user);
 
                 if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                {
+                    if (user.Image is not null)
+                    {
+                        var path = ImagePath(user.Image);
+                        if (Exists(path))
+                            System.IO.File.Delete(path);
+                    }
                     return Ok();
+                }
             }
             catch (Exception ex)
             {
-                var exist = await unit.GetUser
-                                    .FindAsync(id)
-                                    .ConfigureAwait(false);
-
-                if (exist == null) return NotFound();
-
                 await ex.LogAsync().ConfigureAwait(false);
             }
             return StatusCode((int)HttpStatusCode.InternalServerError);
@@ -204,9 +218,10 @@ namespace CodeFactoryAPI.Controllers
             {
                 if (disposing)
                 {
-                    unit?.Dispose();
+                    unit.Dispose();
                 }
                 unit = null;
+                disposed = true;
             }
         }
         #endregion

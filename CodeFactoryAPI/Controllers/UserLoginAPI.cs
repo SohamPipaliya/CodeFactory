@@ -15,7 +15,7 @@ namespace CodeFactoryAPI.Controllers
         private UnitOfWork unit;
 
         public UserLoginAPI(Context context) =>
-            unit = new(context);
+            unit = context;
 
         [HttpPost]
         public async Task<IActionResult> Post(UserLogin user)
@@ -54,9 +54,10 @@ namespace CodeFactoryAPI.Controllers
             {
                 if (disposing)
                 {
-                    unit?.Dispose();
+                    unit.Dispose();
                 }
                 unit = null;
+                disposed = true;
             }
         }
         #endregion

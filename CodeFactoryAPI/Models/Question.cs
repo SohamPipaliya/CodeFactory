@@ -42,8 +42,8 @@ namespace CodeFactoryAPI.Models
         [ForeignKey("Tag1_ID")]
         public Tag? Tag1 { get; set; }
 
-        [Required]
-        public Guid Tag2_ID { get; set; }
+        //[Required]
+        public Guid? Tag2_ID { get; set; }
 
         [ForeignKey("Tag2_ID")]
         public Tag? Tag2 { get; set; }

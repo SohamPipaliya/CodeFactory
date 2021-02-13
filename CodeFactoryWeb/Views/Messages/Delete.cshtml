@@ -15,10 +15,16 @@
             @Html.DisplayFor(model => model.Messages)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+            @Html.DisplayNameFor(model => model.Messeger)
         </dt>
         <dd class="col-sm-10">
-            @Link(Model.User.Email, ControllerName.Users, ActionName.Details, Model.User_ID)
+            @Link("Go to", ControllerName.Users, ActionName.Details, Model.Messeger_ID)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Receiver)
+        </dt>
+        <dd class="col-sm-10">
+            @Link("Go to", ControllerName.Users, ActionName.Details, Model.Receiver_ID)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Question)
@@ -27,7 +33,7 @@
             @Link("Go to Question", ControllerName.Questions, ActionName.Details, Model.Question_ID)
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>

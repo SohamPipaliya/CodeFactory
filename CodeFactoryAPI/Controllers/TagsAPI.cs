@@ -2,32 +2,53 @@
 using CodeFactoryAPI.Extra;
 using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using static Utf8Json.JsonSerializer;
+using static CodeFactoryAPI.Extra.Addons;
 
 namespace CodeFactoryAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagsAPI : ControllerBase
+    public class TagsAPI : ControllerBase, IDisposable
     {
-        private readonly UnitOfWork unit;
+        private UnitOfWork unit;
 
         public TagsAPI(Context context) =>
             unit = context;
 
         [HttpGet]
-        public IActionResult GetTags() =>
-            Ok(ToJsonString(unit.GetTag.GetAll()));
+        public async Task<IActionResult> GetTags()
+        {
+            try
+            {
+                var json = SerializeToJson<IEnumerable<Tag>>(unit.GetTag.GetAll());
+                return Ok(json);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetTag(Guid id)
         {
-            var tag = await unit.GetTag.FindAsync(id);
-            return tag is null ? NotFound() : Ok(ToJsonString(tag));
+            try
+            {
+                var tag = await unit.GetTag.FindAsync(id).ConfigureAwait(false);
+                return tag is null ? NotFound() : Ok(SerializeToJson(tag));
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpPut("{id:guid}")]
@@ -41,17 +62,17 @@ namespace CodeFactoryAPI.Controllers
                 try
                 {
                     unit.GetTag.Update(tag);
-                    await unit.SaveAsync().ConfigureAwait(false);
-                    return NoContent();
+                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                        return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    var exist = await unit.GetTag.FindAsync(id);
-                    if (exist is null)
+                    var exist = await unit.GetTag.AnyAsync(tag => tag.Tag_ID == id).ConfigureAwait(false);
+                    if (!exist)
                         return NotFound();
                     await ex.LogAsync().ConfigureAwait(false);
-                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -59,17 +80,22 @@ namespace CodeFactoryAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostTag(Tag tag)
         {
-            try
+            if (ModelState.IsValid)
             {
-                unit.GetTag.Add(tag);
-                await unit.SaveAsync();
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
+                try
+                {
+                    tag.Tag_ID = Guid.NewGuid();
+                    unit.GetTag.Add(tag);
+                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                        return Ok();
+                }
+                catch (Exception ex)
+                {
+                    await ex.LogAsync().ConfigureAwait(false);
+                }
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
+            else return BadRequest();
         }
 
         [HttpDelete("{id:guid}")]
@@ -77,18 +103,44 @@ namespace CodeFactoryAPI.Controllers
         {
             try
             {
-                await unit.GetTag.RemoveAsync(id);
+                var tag = await unit.GetTag.FindAsync(tag => tag.Tag_ID == id).ConfigureAwait(false);
+                if (tag is null)
+                    return NotFound();
+
+                unit.GetTag.Remove(tag);
+
                 if (await unit.SaveAsync() > 0)
-                    return NoContent();
+                    return Ok();
             }
             catch (Exception ex)
             {
-                var exist = await unit.GetTag.AnyAsync(x => x.Tag_ID == id);
-                if (exist)
-                    return NotFound();
                 await ex.LogAsync().ConfigureAwait(false);
             }
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
+
+        #region Dispose
+        private bool disposed = false;
+
+        [NonAction]
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    unit.Dispose();
+                }
+                unit = null;
+                disposed = true;
+            }
+        }
+        #endregion
     }
 }

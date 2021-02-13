@@ -47,11 +47,11 @@ namespace CodeFactoryAPI.DAL
         public Task<List<T>> GetAllAsync() =>
              model.ToListAsync();
 
-        public async Task<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T>> RemoveAsync(object id) =>
-            model.Remove(await FindAsync(id));
+        public async Task<T?> RemoveAsync(object id) =>
+            model.Remove(await FindAsync(id)).Entity;
 
-        public Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T> Remove(T entity) =>
-            model.Remove(entity);
+        public T? Remove(T entity) =>
+            model.Remove(entity).Entity;
 
         public int Save() =>
             Context.SaveChanges();

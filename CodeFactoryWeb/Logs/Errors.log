@@ -1,47 +1,16 @@
-Date:-   03-02-2021 09:46:06 AM
-Exception:-   Response status code does not indicate success: 404 (Not Found).
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
-
-Date:-   03-02-2021 04:20:34 PM
-Exception:-   Unable to cast object of type 'System.String' to type 'System.Int32'.
-StackTrace:-   at CodeFactoryWeb.Controllers.QuestionsController.Create(Question question, IFormFile[] files) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Controllers\QuestionsController.cs:line 45
-
-Date:-   03-02-2021 04:21:55 PM
-Exception:-   Unable to cast object of type 'System.String' to type 'System.Int32'.
-StackTrace:-   at CodeFactoryWeb.Controllers.QuestionsController.Create(Question question, IFormFile[] files) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Controllers\QuestionsController.cs:line 45
-
-Date:-   04-02-2021 01:04:01 PM
+Date:-   10-02-2021 05:33:44 PM
 Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 58
 
-Date:-   04-02-2021 04:46:14 PM
-Exception:-   An error occurred while sending the request.
-Inner Exception:-   Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
-Date:-   04-02-2021 04:47:01 PM
-Exception:-   An error occurred while sending the request.
-Inner Exception:-   Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
+Date:-   10-02-2021 05:34:02 PM
+Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 58
 
-Date:-   04-02-2021 04:51:39 PM
-Exception:-   An error occurred while sending the request.
-Inner Exception:-   Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
-
-Date:-   04-02-2021 04:52:43 PM
-Exception:-   An error occurred while sending the request.
-Inner Exception:-   Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
-
-Date:-   06-02-2021 09:51:12 AM
-Exception:-   An error occurred while sending the request.
-Inner Exception:-   Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 56
-
-Date:-   06-02-2021 04:58:35 PM
+Date:-   11-02-2021 10:52:20 AM
 Exception:-   expected:'{', actual:'[', at offset:0
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 59
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 57
 
-Date:-   06-02-2021 05:03:51 PM
+Date:-   11-02-2021 11:23:39 AM
 Exception:-   expected:'{', actual:'[', at offset:0
-StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 59
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.GetDataAsync[T](HttpClient client, APIName url, Object id) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 57
 

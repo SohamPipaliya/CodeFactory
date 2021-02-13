@@ -8,14 +8,18 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Utf8Json;
+using Utf8Json.Resolvers;
 using static System.IO.File;
 
 namespace CodeFactoryAPI.Extra
 {
     public static class Addons
     {
+        #region GetImagePath
         public static string ImagePath(string name, string directory = "Users") =>
                  Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Files", "Images", directory, name);
+        #endregion
 
         #region SetColumnState
         public static void SetUpdatedColumns<T>(this EntityEntry<T> value, params string[] columnNames) where T : class
@@ -79,62 +83,99 @@ namespace CodeFactoryAPI.Extra
             "bitch"
         };
 
-        public static Task<string> FilterStringAsync(this string? value) => Task.Run(() =>
-        {
-            var sb = new StringBuilder(value ??= string.Empty);
+        public static Task<string> FilterStringAsync(this string? value, char ch = ' ') => Task.Run(() =>
+          {
+              var sb = new StringBuilder(value ??= string.Empty);
 
-            foreach (var item in value.Split(' '))
-                if (BadWords.Contains(item.ToLower()))
-                    sb.Replace(item, String.Empty);
+              foreach (var item in value.Split(ch))
+                  if (BadWords.Contains(item.ToLower()))
+                      sb.Replace(item, String.Empty);
 
-            return sb.ToString();
-        });
+              return sb.ToString();
+          });
         #endregion
 
         #region SetUpdatedColumn
-        public async static Task SetColumnsWithImages(this Question question, IFormFile[] files)
+        public async static Task SetColumnsWithImages<T>(this T value, IFormFile[] files) where T : class
         {
-            var list = new List<string>();
+            var arr = new string[5];
             var extension = ".png";
 
-            if (files.Length is 1)
+            Question question = value as Question;
+            if (question is not null)
             {
-                list.Add(question.Image1 = Guid.NewGuid() + extension);
-            }
-            else if (files.Length is 2)
-            {
-                list.Add(question.Image1 = Guid.NewGuid() + extension);
-                list.Add(question.Image2 = Guid.NewGuid() + extension);
-            }
-            else if (files.Length is 3)
-            {
-                list.Add(question.Image1 = Guid.NewGuid() + extension);
-                list.Add(question.Image2 = Guid.NewGuid() + extension);
-                list.Add(question.Image3 = Guid.NewGuid() + extension);
-            }
-            else if (files.Length is 4)
-            {
-                list.Add(question.Image1 = Guid.NewGuid() + extension);
-                list.Add(question.Image2 = Guid.NewGuid() + extension);
-                list.Add(question.Image3 = Guid.NewGuid() + extension);
-                list.Add(question.Image4 = Guid.NewGuid() + extension);
-            }
-            else if (files.Length is 5)
-            {
-                list.Add(question.Image1 = Guid.NewGuid() + extension);
-                list.Add(question.Image2 = Guid.NewGuid() + extension);
-                list.Add(question.Image3 = Guid.NewGuid() + extension);
-                list.Add(question.Image4 = Guid.NewGuid() + extension);
-                list.Add(question.Image5 = Guid.NewGuid() + extension);
+                if (files.Length is 1)
+                {
+                    arr[0] = question.Image1 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 2)
+                {
+                    arr[0] = question.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = question.Image2 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 3)
+                {
+                    arr[0] = question.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = question.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = question.Image3 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 4)
+                {
+                    arr[0] = question.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = question.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = question.Image3 = Guid.NewGuid() + extension;
+                    arr[3] = question.Image4 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 5)
+                {
+                    arr[0] = question.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = question.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = question.Image3 = Guid.NewGuid() + extension;
+                    arr[3] = question.Image4 = Guid.NewGuid() + extension;
+                    arr[4] = question.Image5 = Guid.NewGuid() + extension;
+                }
             }
 
-            for (int i = 0; i < list.Count; i++)
+            var reply = value as Reply;
+            if (reply is not null)
             {
-                using (var fs = new FileStream(ImagePath(name: list[i], directory: "Questions"), FileMode.Create))
+                if (files.Length is 1)
                 {
-                    await files[i].CopyToAsync(fs).ConfigureAwait(false);
-                    await fs.FlushAsync().ConfigureAwait(false);
+                    arr[0] = reply.Image1 = Guid.NewGuid() + extension;
                 }
+                else if (files.Length is 2)
+                {
+                    arr[0] = reply.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = reply.Image2 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 3)
+                {
+                    arr[0] = reply.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = reply.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = reply.Image3 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 4)
+                {
+                    arr[0] = reply.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = reply.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = reply.Image3 = Guid.NewGuid() + extension;
+                    arr[3] = reply.Image4 = Guid.NewGuid() + extension;
+                }
+                else if (files.Length is 5)
+                {
+                    arr[0] = reply.Image1 = Guid.NewGuid() + extension;
+                    arr[1] = reply.Image2 = Guid.NewGuid() + extension;
+                    arr[2] = reply.Image3 = Guid.NewGuid() + extension;
+                    arr[3] = reply.Image4 = Guid.NewGuid() + extension;
+                    arr[4] = reply.Image5 = Guid.NewGuid() + extension;
+                }
+            }
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                using var fs = new FileStream(ImagePath(name: arr[i], directory: "Questions"), FileMode.Create);
+                await files[i].CopyToAsync(fs).ConfigureAwait(false);
+                await fs.FlushAsync().ConfigureAwait(false);
             }
         }
         #endregion
@@ -182,38 +223,77 @@ namespace CodeFactoryAPI.Extra
         #endregion
 
         #region DeleteImages
-        public static void DeleteImages(this Question question)
+        public static void DeleteImages<T>(this T value)
         {
             string path;
-            if (question.Image1 is not null)
+            Question question;
+            if ((question = value as Question) is not null)
             {
-                path = ImagePath(question.Image1, "Questions");
-                if (Exists(path))
-                    Delete(path);
+                if (question.Image1 is not null)
+                {
+                    path = ImagePath(question.Image1, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (question.Image2 is not null)
+                {
+                    path = ImagePath(question.Image2, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (question.Image3 is not null)
+                {
+                    path = ImagePath(question.Image3, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (question.Image4 is not null)
+                {
+                    path = ImagePath(question.Image4, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (question.Image5 is not null)
+                {
+                    path = ImagePath(question.Image5, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
             }
-            if (question.Image2 is not null)
+
+            Reply reply;
+            if ((reply = value as Reply) is not null)
             {
-                path = ImagePath(question.Image2, "Questions");
-                if (Exists(path))
-                    Delete(path);
-            }
-            if (question.Image3 is not null)
-            {
-                path = ImagePath(question.Image3, "Questions");
-                if (Exists(path))
-                    Delete(path);
-            }
-            if (question.Image4 is not null)
-            {
-                path = ImagePath(question.Image4, "Questions");
-                if (Exists(path))
-                    Delete(path);
-            }
-            if (question.Image5 is not null)
-            {
-                path = ImagePath(question.Image5, "Questions");
-                if (Exists(path))
-                    Delete(path);
+                if (reply.Image1 is not null)
+                {
+                    path = ImagePath(reply.Image1, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (reply.Image2 is not null)
+                {
+                    path = ImagePath(reply.Image2, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (reply.Image3 is not null)
+                {
+                    path = ImagePath(reply.Image3, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (reply.Image4 is not null)
+                {
+                    path = ImagePath(reply.Image4, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
+                if (reply.Image5 is not null)
+                {
+                    path = ImagePath(reply.Image5, "Questions");
+                    if (Exists(path))
+                        Delete(path);
+                }
             }
         }
         #endregion
@@ -241,6 +321,11 @@ namespace CodeFactoryAPI.Extra
             }
             catch { }
         });
+        #endregion
+
+        #region SerializeToJson
+        public static string SerializeToJson<T>(T data/*, IJsonFormatterResolver jsonFormatterResolver = null*/) =>
+            JsonSerializer.ToJsonString(data, /*jsonFormatterResolver ?? */StandardResolver.ExcludeNull);
         #endregion
     }
 

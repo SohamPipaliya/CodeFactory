@@ -17,23 +17,63 @@ namespace CodeFactoryWeb.Controllers
         public TagsController() =>
             client = new() { BaseAddress = Addons.HostUrl };
 
-        public async Task<IActionResult> Index() =>
-            View(await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI));
-
-        public async Task<IActionResult> Details(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
-
-        public async Task<IActionResult> Edit(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
-
-        public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<Tag>(APIName.TagsAPI, id));
-
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Index()
         {
-            ViewData["Tag_ID"] = new SelectList(await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI), "Tag_ID", "Name");
-            return View();
+            try
+            {
+                var data = await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI).ConfigureAwait(false);
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return View();
+            }
         }
+
+        public async Task<IActionResult> Details(Guid id)
+        {
+            try
+            {
+                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
+                return View(tag);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return View();
+            }
+        }
+
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            try
+            {
+                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
+                return View(tag);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return View();
+            }
+        }
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
+                return View(tag);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return View();
+            }
+        }
+
+        public IActionResult Create() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -43,13 +83,13 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PostAsJsonAsync("TagsAPI", tag);
+                    using var response = await client.PostAsJsonAsync("TagsAPI", tag).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
             return View(tag);
@@ -63,13 +103,13 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PutAsJsonAsync("TagsAPI/" + id, tag);
+                    using var response = await client.PutAsJsonAsync("TagsAPI/" + id, tag).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
             return View(tag);
@@ -77,19 +117,19 @@ namespace CodeFactoryWeb.Controllers
 
         [HttpPost, ActionName(nameof(Delete))]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteFinally(Guid id)
+        public async Task<IActionResult> DeleteTag(Guid id)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    using var response = await client.DeleteAsync("TagsAPI/" + id);
+                    using var response = await client.DeleteAsync("TagsAPI/" + id).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    await ex.LogAsync();
+                    await ex.LogAsync().ConfigureAwait(false);
                 }
             }
             return View();

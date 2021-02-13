@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CodeFactoryAPI.Models.Reply>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RepliedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Question)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RepliedDate)
+                </td>
+                <td>
+                    @Link("Go to", ControllerName.Users, ActionName.Details, item.User_ID)
+                </td>
+                <td>
+                    @Link("Go to", ControllerName.Questions, ActionName.Details, item.Question_ID)
+                </td>
+                <td>
+                    @Link("Edit", ControllerName.Replies, ActionName.Edit, item.Reply_ID) |
+                    @Link("Details", ControllerName.Replies, ActionName.Details, item.Reply_ID) |
+                    @Link("Delete", ControllerName.Replies, ActionName.Delete, item.Reply_ID)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Utf8Json.Resolvers;
 using static Utf8Json.JsonSerializer;
 
 namespace CodeFactoryWeb.Extra
 {
     public static class Addons
     {
+        #region HostURL
         public static Uri HostUrl =>
-            new("https://localhost:44354/api/");
-
-        public static string GetImage(string name, string directory = "Questions") =>
-            name is null ? null : $"https://localhost:44354/files/images/{directory}/" + name;
+           new("https://localhost:44354/api/");
+        #endregion
 
         #region ParseToHttpContent
         public static Task<StringContent> ParseToStringContentAsync<T>
@@ -29,7 +29,7 @@ namespace CodeFactoryWeb.Extra
         {
             try
             {
-                var x = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Errors.log");
 
                 using StreamWriter writer = new(path, true) { AutoFlush = true };
@@ -56,7 +56,7 @@ namespace CodeFactoryWeb.Extra
             try
             {
                 var data = await client.GetStringAsync(id == null ? url.ToString() : url + "/" + id).ConfigureAwait(false);
-                t = Deserialize<T>(data);
+                t = Deserialize<T>(data, StandardResolver.ExcludeNull);
             }
             catch (Exception ex)
             {
@@ -77,15 +77,61 @@ namespace CodeFactoryWeb.Extra
         #region CustomTagHelper
         public static IHtmlContent Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
             new HtmlString($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
+
+        public static string GetImage(string name, string directory = "Questions") =>
+            name is null ? null : $"https://localhost:44354/files/images/{directory}/{name}";
+        #endregion
+
+        #region PostorPutAsFormData
+        public static async Task<HttpResponseMessage?> AsFormDataAsync<T>(this HttpClient client, APIName aPIName, MethodName methodName, T value, IFormFile[]? files = null, Guid? id = default)
+        {
+            Stream[]? streams = null;
+            StreamContent[]? streamContents = null;
+            try
+            {
+                using var data = new MultipartFormDataContent();
+                using var stringContent = await value.ParseToStringContentAsync().ConfigureAwait(false);
+                data.Add(stringContent, "question");
+
+                if (files is not null && files.Length > 0 && files.Length < 6)
+                {
+                    streams = new Stream[files.Length];
+                    streamContents = new StreamContent[files.Length];
+
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        streams[i] = files[i].OpenReadStream();
+                        streamContents[i] = new StreamContent((streams[i]));
+                        data.Add(streamContents[i], "files", files[i].FileName);
+                    }
+                }
+
+                return methodName == MethodName.PostAsync
+                     ? await client.PostAsync(aPIName.ToString(), data).ConfigureAwait(false)
+                     : await client.PutAsync(aPIName.ToString() + id, data).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return null;
+            }
+            finally
+            {
+                streams?.ForEachDispose();
+                streamContents?.ForEachDispose();
+            }
+        }
         #endregion
     }
 
+    #region Enums
     public enum APIName
     {
         QuestionsAPI,
         TagsAPI,
         UsersAPI,
-        MessagesAPI
+        MessagesAPI,
+        RepliesAPI
     }
 
     public enum ControllerName
@@ -93,7 +139,8 @@ namespace CodeFactoryWeb.Extra
         Messages,
         Questions,
         Tags,
-        Users
+        Users,
+        Replies
     }
 
     public enum ActionName
@@ -104,4 +151,11 @@ namespace CodeFactoryWeb.Extra
         Delete,
         Details
     }
+
+    public enum MethodName
+    {
+        PostAsync,
+        PutAsync
+    }
+    #endregion
 }

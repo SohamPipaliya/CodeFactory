@@ -13,7 +13,6 @@ namespace CodeFactoryAPI.DAL
         private Repository<Tag> tagRepo;
         private Repository<Message> messageRepo;
         private Context context;
-        private bool disposed = false;
         #endregion
 
         #region Properties
@@ -39,14 +38,17 @@ namespace CodeFactoryAPI.DAL
         public int Save() =>
             context.SaveChanges();
 
-        public async Task<int> SaveAsync() =>
-            await context.SaveChangesAsync();
+        public Task<int> SaveAsync() =>
+             context.SaveChangesAsync();
 
+        #region Dispose
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -68,6 +70,7 @@ namespace CodeFactoryAPI.DAL
                 disposed = true;
             }
         }
+        #endregion
 
         public static implicit operator UnitOfWork(Context context) => new(context);
     }
