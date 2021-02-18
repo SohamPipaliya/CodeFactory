@@ -22,45 +22,16 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetMessages()
-        {
-            try
-            {
-                return Ok(SerializeToJson<IEnumerable<Message>>(/*await*/ unit.GetMessage.Model
-                                                                   //.Include(message => message.Messeger)
-                                                                   //.Include(message => message.Receiver)
-                                                                   .OrderBy(message => message.Messages)));
-                //.SetMetaDataAsync(message => message.Messeger.SetUserState(),
-                //                  message => message.Receiver.SetUserState())
-                //.ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
+        public async Task<IActionResult> GetMessages() =>
+            await this.ToActionResult(SerializeToJson<IEnumerable<Message>>(unit.GetMessage.Model
+                                                                   .OrderBy(message => message.Messages)))
+                                                                   .ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetMessage(Guid id)
-        {
-            try
-            {
-                return Ok(SerializeToJson<Message>(await /*(await */unit.GetMessage.Model
-                                                                 //.Include(message => message.Messeger)
-                                                                 //.Include(message => message.Receiver)
+        public async Task<IActionResult> GetMessage(Guid id) =>
+                 await this.ToActionResult(SerializeToJson<Message>(await unit.GetMessage.Model
                                                                  .FirstAsync(message => message.Message_ID == id)
-                                                                 .ConfigureAwait(false)));
-                //.SetMetaDataAsync(message => message.Messeger.SetUserState(),
-                //                  message => message.Receiver.SetUserState())
-                //.ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+                                                                 .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutMessage(Guid id, Message message)
@@ -100,6 +71,7 @@ namespace CodeFactoryAPI.Controllers
                 try
                 {
                     message.Messages = await message.Messages.FilterStringAsync().ConfigureAwait(false);
+                    message.MessageDate = DateTime.Now;
 
                     unit.GetMessage.Add(message);
                     if (await unit.SaveAsync().ConfigureAwait(false) > 0)

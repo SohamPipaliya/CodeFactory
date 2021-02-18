@@ -31,18 +31,19 @@ namespace CodeFactoryAPI.Models
 
         public DateTime AskedDate { get; set; }
 
-        public Guid User_ID { get; set; }
+        [Required]
+        public Guid? User_ID { get; set; }
 
         [ForeignKey("User_ID")]
         public User? User { get; set; }
 
         [Required]
-        public Guid Tag1_ID { get; set; }
+        public Guid? Tag1_ID { get; set; }
 
         [ForeignKey("Tag1_ID")]
         public Tag? Tag1 { get; set; }
 
-        //[Required]
+        [Required]
         public Guid? Tag2_ID { get; set; }
 
         [ForeignKey("Tag2_ID")]

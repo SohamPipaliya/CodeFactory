@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using CodeFactoryAPI.Extra;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,45 +27,32 @@ namespace CodeFactoryWeb.Extra
                 new StringContent(ToJsonString(value), Encoding.UTF8, type));
         #endregion
 
-        #region LogException
-        public static Task LogAsync(this Exception value) => Task.Run(() =>
-        {
-            try
-            {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Errors.log");
-
-                using StreamWriter writer = new(path, true) { AutoFlush = true };
-
-                writer.WriteLine($"Date:-   {DateTime.Now}");
-                writer.WriteLine($"Exception:-   {value.Message}");
-                if (value.InnerException is not null)
-                    writer.WriteLine($"Inner Exception:-   {value.InnerException.Message}");
-                if (value.StackTrace is not null)
-                    writer.WriteLine($"StackTrace:-   {value.StackTrace.Split("   ")[^1]}");
-                writer.WriteLine();
-
-                writer.Flush();
-                writer.Close();
-            }
-            catch { }
-        });
-        #endregion
-
         #region GetDataFromAPI
         public async static Task<T?> GetDataAsync<T>(this HttpClient client, APIName url, object? id = null) where T : class
         {
             T? t = null;
             try
             {
-                var data = await client.GetStringAsync(id == null ? url.ToString() : url + "/" + id).ConfigureAwait(false);
+                string? data = await client.GetStringAsync(id == null ? url.ToString() : url + "/" + id).ConfigureAwait(false);
                 t = Deserialize<T>(data, StandardResolver.ExcludeNull);
+            }
+            catch { }
+            return t;
+        }
+        #endregion
+
+        #region ToIActionResult
+        public static async Task<IActionResult> ToActionResult<T>(this Controller controller, T data)
+        {
+            try
+            {
+                return data is null ? controller.NotFound() : controller.View(data);
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
+                return controller.RedirectToAction("Error", "Error");
             }
-            return t;
         }
         #endregion
 
@@ -78,47 +68,64 @@ namespace CodeFactoryWeb.Extra
         public static IHtmlContent Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
             new HtmlString($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
 
-        public static string GetImage(string name, string directory = "Questions") =>
-            name is null ? null : $"https://localhost:44354/files/images/{directory}/{name}";
+        public static string GetImage(string? name, string directory = "Questions") =>
+            $"https://localhost:44354/files/images/{directory}/{name}";
         #endregion
 
         #region PostorPutAsFormData
-        public static async Task<HttpResponseMessage?> AsFormDataAsync<T>(this HttpClient client, APIName aPIName, MethodName methodName, T value, IFormFile[]? files = null, Guid? id = default)
+        public static async Task<HttpResponseMessage?> PostAsFormDataAsync<T>(this HttpClient client, string apiName, T value, IFormFile[]? files)
         {
-            Stream[]? streams = null;
-            StreamContent[]? streamContents = null;
+            var data = await GetDataContent(value, files).ConfigureAwait(false);
             try
             {
-                using var data = new MultipartFormDataContent();
-                using var stringContent = await value.ParseToStringContentAsync().ConfigureAwait(false);
-                data.Add(stringContent, "question");
-
-                if (files is not null && files.Length > 0 && files.Length < 6)
-                {
-                    streams = new Stream[files.Length];
-                    streamContents = new StreamContent[files.Length];
-
-                    for (int i = 0; i < files.Length; i++)
-                    {
-                        streams[i] = files[i].OpenReadStream();
-                        streamContents[i] = new StreamContent((streams[i]));
-                        data.Add(streamContents[i], "files", files[i].FileName);
-                    }
-                }
-
-                return methodName == MethodName.PostAsync
-                     ? await client.PostAsync(aPIName.ToString(), data).ConfigureAwait(false)
-                     : await client.PutAsync(aPIName.ToString() + id, data).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return null;
+                using var multipartFormDataContent = data.multipartFormDataContent;
+                return await client.PostAsync(apiName, multipartFormDataContent).ConfigureAwait(false);
             }
             finally
             {
-                streams?.ForEachDispose();
-                streamContents?.ForEachDispose();
+                data.StringContent.Dispose();
+                data.streams?.ForEachDispose();
+                data.streamContents?.ForEachDispose();
+            }
+        }
+
+        private async static Task<(MultipartFormDataContent multipartFormDataContent, Stream[] streams, StreamContent[] streamContents, StringContent StringContent)> GetDataContent<T>(T value, IFormFile[]? files, string parameterName = null)
+        {
+            Stream[] streams = null;
+            StreamContent[] streamContents = null;
+
+            var data = new MultipartFormDataContent();
+            var stringContent = await value.ParseToStringContentAsync().ConfigureAwait(false);
+            data.Add(stringContent, parameterName ?? value.GetType().Name);
+
+            if (files is not null && files.Length > 0)
+            {
+                streams = new Stream[files.Length];
+                streamContents = new StreamContent[files.Length];
+
+                for (int i = 0; i < files.Length; i++)
+                {
+                    streams[i] = files[i].OpenReadStream();
+                    streamContents[i] = new StreamContent((streams[i]));
+                    data.Add(streamContents[i], "files", files[i].FileName);
+                }
+            }
+            return (data, streams, streamContents, stringContent);
+        }
+
+        public static async Task<HttpResponseMessage?> PutAsFormDataAsync<T>(this HttpClient client, string apiName, T value, IFormFile[]? files)
+        {
+            var data = await GetDataContent(value, files).ConfigureAwait(false);
+            try
+            {
+                using var multipartFormDataContent = data.multipartFormDataContent;
+                return await client.PutAsync(apiName, multipartFormDataContent).ConfigureAwait(false);
+            }
+            finally
+            {
+                data.StringContent.Dispose();
+                data.streams.ForEachDispose();
+                data.streamContents.ForEachDispose();
             }
         }
         #endregion
@@ -150,12 +157,6 @@ namespace CodeFactoryWeb.Extra
         Edit,
         Delete,
         Details
-    }
-
-    public enum MethodName
-    {
-        PostAsync,
-        PutAsync
     }
     #endregion
 }

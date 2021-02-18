@@ -49,9 +49,9 @@ namespace CodeFactoryAPI.Migrations
                     Image4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AskedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Tag1_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Tag2_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Tag1_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Tag2_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Tag3_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Tag4_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Tag5_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
@@ -64,37 +64,37 @@ namespace CodeFactoryAPI.Migrations
                         column: x => x.Tag1_ID,
                         principalTable: "Tags",
                         principalColumn: "Tag_ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Questions_Tags_Tag2_ID",
                         column: x => x.Tag2_ID,
                         principalTable: "Tags",
                         principalColumn: "Tag_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Questions_Tags_Tag3_ID",
                         column: x => x.Tag3_ID,
                         principalTable: "Tags",
                         principalColumn: "Tag_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Questions_Tags_Tag4_ID",
                         column: x => x.Tag4_ID,
                         principalTable: "Tags",
                         principalColumn: "Tag_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Questions_Tags_Tag5_ID",
                         column: x => x.Tag5_ID,
                         principalTable: "Tags",
                         principalColumn: "Tag_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Questions_Users_User_ID",
                         column: x => x.User_ID,
                         principalTable: "Users",
                         principalColumn: "User_ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,7 +103,9 @@ namespace CodeFactoryAPI.Migrations
                 {
                     Message_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Messages = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
-                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MessageDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Messeger_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Receiver_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Question_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -114,13 +116,19 @@ namespace CodeFactoryAPI.Migrations
                         column: x => x.Question_ID,
                         principalTable: "Questions",
                         principalColumn: "Question_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Messages_Users_User_ID",
-                        column: x => x.User_ID,
+                        name: "FK_Messages_Users_Messeger_ID",
+                        column: x => x.Messeger_ID,
                         principalTable: "Users",
                         principalColumn: "User_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_Receiver_ID",
+                        column: x => x.Receiver_ID,
+                        principalTable: "Users",
+                        principalColumn: "User_ID",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -136,7 +144,7 @@ namespace CodeFactoryAPI.Migrations
                     Image4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RepliedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Question_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -147,14 +155,19 @@ namespace CodeFactoryAPI.Migrations
                         column: x => x.Question_ID,
                         principalTable: "Questions",
                         principalColumn: "Question_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Replies_Users_User_ID",
                         column: x => x.User_ID,
                         principalTable: "Users",
                         principalColumn: "User_ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_Messeger_ID",
+                table: "Messages",
+                column: "Messeger_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_Question_ID",
@@ -162,9 +175,9 @@ namespace CodeFactoryAPI.Migrations
                 column: "Question_ID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_User_ID",
+                name: "IX_Messages_Receiver_ID",
                 table: "Messages",
-                column: "User_ID");
+                column: "Receiver_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Questions_Tag1_ID",

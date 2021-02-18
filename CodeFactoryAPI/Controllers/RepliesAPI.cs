@@ -23,42 +23,22 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetReplies()
-        {
-            try
-            {
-                return Ok(SerializeToJson<IEnumerable<Reply>>(await unit.GetReply.Model
+        public async Task<IActionResult> GetReplies() =>
+            await this.ToActionResult(SerializeToJson<IEnumerable<Reply>>(await unit.GetReply.Model
                                                                      .Include(reply => reply.User)
                                                                      .OrderBy(reply => reply.Message)
                                                                      .SetMetaDataAsync(reply => reply.User.SetUserState())
-                                                                     .ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+                                                                     .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetReply(Guid id)
-        {
-            try
-            {
-                return Ok(SerializeToJson<Reply>(await
-                                             (await unit.GetReply.Model
+        public async Task<IActionResult> GetReply(Guid id) =>
+            await this.ToActionResult(SerializeToJson<Reply>(await
+                                                        (await unit.GetReply.Model
                                                         .Include(reply => reply.User)
                                                         .FirstAsync(reply => reply.Reply_ID == id)
                                                         .ConfigureAwait(false))
                                                         .SetMetaDataAsync(reply => reply.User.SetUserState())
-                                                        .ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+                                                        .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutReply(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] Reply reply, IFormFile[]? files)
@@ -77,21 +57,15 @@ namespace CodeFactoryAPI.Controllers
 
                         foreach (var file in files)
                         {
-                            var extension = file.FileName.Split('.')[^1].ToUpper();
-                            var IsImage = extension is "JPG" || extension is "PNG" || extension is "JPEG";
+                            var (IsImage, ActionResult) = this.IsValidImage(file.FileName, file.Length);
 
-                            if (IsImage)
-                            {
-                                IsImage = file.Length > 51200 && file.Length < 1073741825;
-
-                                if (!IsImage)
-                                    return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
-                            }
-                            else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
+                            if (!IsImage) return ActionResult;
                         }
 
                         await reply.SetColumnsWithImages(files).ConfigureAwait(false);
                     }
+
+                    reply.Message = await reply.Message.FilterStringAsync().ConfigureAwait(false);
 
                     var oldReply = await unit.GetReply.Model
                                    .AsNoTracking()
@@ -136,16 +110,9 @@ namespace CodeFactoryAPI.Controllers
 
                     foreach (var file in files)
                     {
-                        var extension = file.FileName.Split('.')[^1].ToUpper();
-                        var IsImage = extension is "JPG" || extension is "PNG" || extension is "JPEG";
+                        var (IsImage, ActionResult) = this.IsValidImage(file.FileName, file.Length);
 
-                        if (IsImage)
-                        {
-                            IsImage = file.Length > 51200 && file.Length < 1073741825;
-
-                            if (!IsImage) return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
-                        }
-                        else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
+                        if (!IsImage) return ActionResult;
                     }
 
                     await reply.SetColumnsWithImages(files).ConfigureAwait(false);
@@ -170,6 +137,7 @@ namespace CodeFactoryAPI.Controllers
             try
             {
                 var reply = await unit.GetReply.FindAsync(rpl => rpl.Reply_ID == id).ConfigureAwait(false);
+
                 if (reply is null)
                     return NotFound();
 

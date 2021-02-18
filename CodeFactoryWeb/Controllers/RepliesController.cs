@@ -1,11 +1,11 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using CodeFactoryWeb.Extra;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,34 +17,25 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public RepliesController() =>
-            client = new() { BaseAddress = Addons.HostUrl };
+            client = new() { BaseAddress = Extra.Addons.HostUrl };
 
-        public async Task<IActionResult> Index()
-        {
-            try
-            {
-                var data = await client.GetDataAsync<IEnumerable<Reply>>(APIName.RepliesAPI).ConfigureAwait(false);
-                return View(data);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
-        }
+        public async Task<IActionResult> Index() =>
+            await this.ToActionResult(await client.GetDataAsync<IEnumerable<Reply>>
+                                      (APIName.RepliesAPI).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
 
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(Guid? id) =>
+            await this.ToActionResult(await client.GetDataAsync<Reply>
+                                      (APIName.RepliesAPI, id).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
+
+        public async Task<IActionResult> Delete(Guid? id) =>
+             await Details(id).ConfigureAwait(false);
+
+        public async Task<IActionResult> Edit(Guid? id)
         {
-            try
-            {
-                var reply = await client.GetDataAsync<Reply>(APIName.RepliesAPI, id).ConfigureAwait(false);
-                return View(reply);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
+            await SetViewBag().ConfigureAwait(false);
+            return await Details(id).ConfigureAwait(false);
         }
 
         public async Task<IActionResult> Create()
@@ -61,19 +52,25 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.AsFormDataAsync
-                                                       (APIName.RepliesAPI, MethodName.PostAsync, reply, files).ConfigureAwait(false);
+                    if (files is not null && files.Length > 5)
+                    {
+                        ModelState.AddModelError(nameof(reply.Image1), "Onlys Images are allowed");
+                        return View(reply);
+                    }
+
+                    using var response = await client.PostAsFormDataAsync(APIName.RepliesAPI.ToString(), reply, files)
+                                .ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode)
+                    {
                         return RedirectToAction(nameof(Index));
+                    }
                     else
                     {
-                        using var responseContent = response.Content;
-
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(reply.Image1), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(reply.Image1), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(reply.Image1), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(reply.Image1), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -81,19 +78,11 @@ namespace CodeFactoryWeb.Controllers
                 {
                     ModelState.AddModelError("", "Something went wrong");
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             await SetViewBag().ConfigureAwait(false);
             return View(reply);
-        }
-
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            var question = await client.GetDataAsync<Question>(APIName.QuestionsAPI, id).ConfigureAwait(false);
-            if (question is null) return NotFound();
-
-            await SetViewBag().ConfigureAwait(false);
-            return View(question);
         }
 
         [HttpPost]
@@ -106,18 +95,25 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.AsFormDataAsync
-                                                        (APIName.RepliesAPI, MethodName.PostAsync, reply, files, id).ConfigureAwait(false);
+                    if (files is not null && files.Length > 5)
+                    {
+                        ModelState.AddModelError(nameof(reply.Image1), "Onlys Images are allowed");
+                        return View(reply);
+                    }
+
+                    using var response = await client.PutAsFormDataAsync(APIName.RepliesAPI.ToString() + '/' + id, reply, files)
+                                .ConfigureAwait(false);
+
                     if (response.IsSuccessStatusCode)
+                    {
                         return RedirectToAction(nameof(Index));
+                    }
                     else
                     {
-                        using var responsecontent = response.Content;
-
                         if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(reply.Image1), await responsecontent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(reply.Image1), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(reply.Image1), await responsecontent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(reply.Image1), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -125,14 +121,12 @@ namespace CodeFactoryWeb.Controllers
                 {
                     ModelState.AddModelError("", "Something went wrong");
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             await SetViewBag().ConfigureAwait(false);
             return View(reply);
         }
-
-        public async Task<IActionResult> Delete(Guid? id) =>
-             View(await client.GetDataAsync<Question>(APIName.QuestionsAPI, id).ConfigureAwait(false));
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -148,7 +142,7 @@ namespace CodeFactoryWeb.Controllers
             {
                 ModelState.AddModelError("", "Something went wrong");
             }
-            return View();
+            return RedirectToAction("Error", "Error");
         }
 
         private async Task SetViewBag()

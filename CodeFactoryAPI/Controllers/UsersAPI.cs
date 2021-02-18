@@ -24,34 +24,14 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var json = SerializeToJson<IEnumerable<User>>(unit.GetUser.Model);
-                return Ok(json);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        public async Task<IActionResult> GetUsers() =>
+            await this.ToActionResult(SerializeToJson<IEnumerable<User>>(unit.GetUser.Model)).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetUser(Guid id)
-        {
-            try
-            {
-                var user = await unit.GetUser.FindAsync(user => user.User_ID == id).ConfigureAwait(false);
-                return user == null ? NotFound() : Ok(SerializeToJson<User>(user));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        public async Task<IActionResult> GetUser(Guid id) =>
+            await this.ToActionResult(SerializeToJson<User>(await unit.GetUser
+                                                        .FindAsync(user => user.User_ID == id)
+                                                        .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpPost]
         public async Task<IActionResult> PostUser([FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
@@ -133,36 +113,33 @@ namespace CodeFactoryAPI.Controllers
                         }
                         else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
 
-                        var model = await unit.GetUser.Model
-                                              .AsNoTracking()
-                                              .FirstAsync(x => x.User_ID == id)
-                                              .ConfigureAwait(false);
+                        unit.GetUser.Context.Entry(user)
+                            .SetUpdatedColumns(nameof(user.UserName), nameof(user.Password), nameof(user.Email), nameof(user.Image));
+                    }
+                    else
+                        unit.GetUser.Context.Entry(user)
+                            .SetUpdatedColumns(nameof(user.UserName), nameof(user.Password), nameof(user.Email));
 
-                        if (model?.Image is not null)
+                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                    {
+                        if (file is not null)
                         {
+                            var model = await unit.GetUser.Model.AsNoTracking()
+                                                  .FirstAsync(x => x.User_ID == id)
+                                                  .ConfigureAwait(false);
                             var path = ImagePath(model.Image);
                             if (Exists(path))
                                 System.IO.File.Delete(path);
                         }
-
-                        unit.GetUser.Context.Entry(user)
-                            .SetUpdatedColumns("UserName", "Password", "Email", "Image");
-                    }
-                    else
-                        unit.GetUser.Context.Entry(user)
-                            .SetUpdatedColumns("UserName", "Password", "Email");
-
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
                         return Ok();
+                    }
                 }
                 catch (Exception ex)
                 {
-                    var model = await unit.GetUser
-                                          .FindAsync(user => user.User_ID == id)
-                                          .ConfigureAwait(false);
-                    if (model is null)
+                    if (!await unit.GetUser.AnyAsync(user => user.User_ID == id).ConfigureAwait(false))
                         return NotFound();
-                    else if (user.UserName == model.UserName)
+
+                    if (await unit.GetUser.AnyAsync(us => us.UserName == user.UserName).ConfigureAwait(false))
                         return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
                     await ex.LogAsync().ConfigureAwait(false);

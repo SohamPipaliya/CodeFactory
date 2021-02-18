@@ -1,7 +1,7 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using CodeFactoryWeb.Extra;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -15,63 +15,23 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public TagsController() =>
-            client = new() { BaseAddress = Addons.HostUrl };
+            client = new() { BaseAddress = Extra.Addons.HostUrl };
 
-        public async Task<IActionResult> Index()
-        {
-            try
-            {
-                var data = await client.GetDataAsync<IEnumerable<Tag>>(APIName.TagsAPI).ConfigureAwait(false);
-                return View(data);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
-        }
+        public async Task<IActionResult> Index() =>
+             await this.ToActionResult(await client.GetDataAsync<IEnumerable<Tag>>
+                                      (APIName.TagsAPI).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
 
-        public async Task<IActionResult> Details(Guid id)
-        {
-            try
-            {
-                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
-                return View(tag);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
-        }
+        public async Task<IActionResult> Details(Guid id) =>
+             await this.ToActionResult(await client.GetDataAsync<Tag>
+                                      (APIName.TagsAPI, id).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
 
-        public async Task<IActionResult> Edit(Guid id)
-        {
-            try
-            {
-                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
-                return View(tag);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
-        }
+        public async Task<IActionResult> Edit(Guid id) =>
+            await Details(id).ConfigureAwait(false);
 
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            try
-            {
-                var tag = await client.GetDataAsync<Tag>(APIName.TagsAPI, id).ConfigureAwait(false);
-                return View(tag);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return View();
-            }
-        }
+        public async Task<IActionResult> Delete(Guid id) =>
+            await Details(id).ConfigureAwait(false);
 
         public IActionResult Create() => View();
 
@@ -83,13 +43,14 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PostAsJsonAsync("TagsAPI", tag).ConfigureAwait(false);
+                    using var response = await client.PostAsJsonAsync(APIName.TagsAPI.ToString(), tag).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             return View(tag);
@@ -103,13 +64,14 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PutAsJsonAsync("TagsAPI/" + id, tag).ConfigureAwait(false);
+                    using var response = await client.PutAsJsonAsync(APIName.TagsAPI.ToString() + '/' + id, tag).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             return View(tag);
@@ -123,7 +85,7 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.DeleteAsync("TagsAPI/" + id).ConfigureAwait(false);
+                    using var response = await client.DeleteAsync(APIName.TagsAPI.ToString() + '/' + id).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
@@ -132,7 +94,7 @@ namespace CodeFactoryWeb.Controllers
                     await ex.LogAsync().ConfigureAwait(false);
                 }
             }
-            return View();
+            return RedirectToAction("Error", "Error");
         }
 
         protected override void Dispose(bool disposing)

@@ -15,32 +15,41 @@ namespace CodeFactoryAPI.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("CodeFactoryAPI.Models.Message", b =>
                 {
                     b.Property<Guid>("Message_ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                       .ValueGeneratedOnAdd()
+                       .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("MessageDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Messages")
                         .IsRequired()
                         .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("Question_ID")
+                    b.Property<Guid?>("Messeger_ID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("User_ID")
+                    b.Property<Guid>("Question_ID")
+                        .IsRequired()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("Receiver_ID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Message_ID");
 
+                    b.HasIndex("Messeger_ID");
+
                     b.HasIndex("Question_ID");
 
-                    b.HasIndex("User_ID");
+                    b.HasIndex("Receiver_ID");
 
                     b.ToTable("Messages");
                 });
@@ -52,6 +61,7 @@ namespace CodeFactoryAPI.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AskedDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Code")
@@ -76,7 +86,7 @@ namespace CodeFactoryAPI.Migrations
                     b.Property<string>("Image5")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Tag1_ID")
+                    b.Property<Guid?>("Tag1_ID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("Tag2_ID")
@@ -95,7 +105,7 @@ namespace CodeFactoryAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("User_ID")
+                    b.Property<Guid?>("User_ID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Question_ID");
@@ -143,10 +153,12 @@ namespace CodeFactoryAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("Question_ID")
+                    b.Property<Guid>("Question_ID")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("RepliedDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("User_ID")
@@ -164,8 +176,8 @@ namespace CodeFactoryAPI.Migrations
             modelBuilder.Entity("CodeFactoryAPI.Models.Tag", b =>
                 {
                     b.Property<Guid>("Tag_ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                       .ValueGeneratedOnAdd()
+                       .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -194,7 +206,8 @@ namespace CodeFactoryAPI.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
-                    b.Property<DateTime?>("RegistrationDate")
+                    b.Property<DateTime>("RegistrationDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
@@ -209,17 +222,29 @@ namespace CodeFactoryAPI.Migrations
 
             modelBuilder.Entity("CodeFactoryAPI.Models.Message", b =>
                 {
+                    b.HasOne("CodeFactoryAPI.Models.User", "Messeger")
+                        .WithMany()
+                        .HasForeignKey("Messeger_ID")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.HasOne("CodeFactoryAPI.Models.Question", "Question")
                         .WithMany("Messages")
-                        .HasForeignKey("Question_ID");
+                        .HasForeignKey("Question_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("CodeFactoryAPI.Models.User", "User")
+                    b.HasOne("CodeFactoryAPI.Models.User", "Receiver")
                         .WithMany()
-                        .HasForeignKey("User_ID");
+                        .HasForeignKey("Receiver_ID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Messeger");
 
                     b.Navigation("Question");
 
-                    b.Navigation("User");
+                    b.Navigation("Receiver");
                 });
 
             modelBuilder.Entity("CodeFactoryAPI.Models.Question", b =>
@@ -227,30 +252,32 @@ namespace CodeFactoryAPI.Migrations
                     b.HasOne("CodeFactoryAPI.Models.Tag", "Tag1")
                         .WithMany()
                         .HasForeignKey("Tag1_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("CodeFactoryAPI.Models.Tag", "Tag2")
                         .WithMany()
-                        .HasForeignKey("Tag2_ID");
+                        .HasForeignKey("Tag2_ID")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("CodeFactoryAPI.Models.Tag", "Tag3")
                         .WithMany()
-                        .HasForeignKey("Tag3_ID");
+                        .HasForeignKey("Tag3_ID")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("CodeFactoryAPI.Models.Tag", "Tag4")
                         .WithMany()
-                        .HasForeignKey("Tag4_ID");
+                        .HasForeignKey("Tag4_ID")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("CodeFactoryAPI.Models.Tag", "Tag5")
                         .WithMany()
-                        .HasForeignKey("Tag5_ID");
+                        .HasForeignKey("Tag5_ID")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("CodeFactoryAPI.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("User_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Tag1");
 
@@ -269,11 +296,14 @@ namespace CodeFactoryAPI.Migrations
                 {
                     b.HasOne("CodeFactoryAPI.Models.Question", "Question")
                         .WithMany("Replies")
-                        .HasForeignKey("Question_ID");
+                        .HasForeignKey("Question_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CodeFactoryAPI.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("User_ID");
+                        .HasForeignKey("User_ID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Question");
 

@@ -23,11 +23,9 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> Getquestions()
-        {
-            try
-            {
-                return Ok(SerializeToJson<IEnumerable<Question>>(await unit.GetQuestion.Model
+        public async Task<IActionResult> Getquestions() =>
+            await this.ToActionResult(SerializeToJson<IEnumerable<Question>>
+                                            (await unit.GetQuestion.Model
                                             .Include(question => question.User)
                                             .Include(question => question.Tag1)
                                             .Include(question => question.Tag2)
@@ -51,21 +49,11 @@ namespace CodeFactoryAPI.Controllers
                                                                                 .ToArray()
                                                                                 .SetMetaData(message => message.Receiver.SetUserState(),
                                                                                              message => message.Messeger.SetUserState()))
-                                            .ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+                                            .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetQuestion(Guid id)
-        {
-            try
-            {
-                return Ok(SerializeToJson<Question>(await
+        public async Task<IActionResult> GetQuestion(Guid id) =>
+            await this.ToActionResult(SerializeToJson<Question>(await
                                       (await unit.GetQuestion.Model
                                             .Include(question => question.User)
                                             .Include(question => question.Tag1)
@@ -90,14 +78,7 @@ namespace CodeFactoryAPI.Controllers
                                                                                 .ToArray()
                                                                                 .SetMetaData(message => message.Messeger.SetUserState(),
                                                                                              message => message.Receiver.SetUserState()))
-                                            .ConfigureAwait(false)));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+                                            .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutQuestion(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
@@ -115,16 +96,9 @@ namespace CodeFactoryAPI.Controllers
 
                         foreach (var file in files)
                         {
-                            var extension = file.FileName.Split('.')[^1].ToUpper();
-                            var IsImage = extension is "JPG" || extension is "PNG" || extension is "JPEG";
+                            var (IsImage, ActionResult) = this.IsValidImage(file.FileName, file.Length);
 
-                            if (IsImage)
-                            {
-                                IsImage = file.Length > 51200 && file.Length < 1073741825;
-
-                                if (!IsImage) return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
-                            }
-                            else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
+                            if (!IsImage) return ActionResult;
                         }
 
                         await question.SetColumnsWithImages(files).ConfigureAwait(false);
@@ -182,16 +156,9 @@ namespace CodeFactoryAPI.Controllers
 
                         foreach (var file in files)
                         {
-                            var extension = file.FileName.Split('.')[^1].ToUpper();
-                            var IsImage = extension is "JPG" || extension is "PNG" || extension is "JPEG";
+                            var (IsImage, ActionResult) = this.IsValidImage(file.FileName, file.Length);
 
-                            if (IsImage)
-                            {
-                                IsImage = file.Length > 51200 && file.Length < 1073741825;
-
-                                if (!IsImage) return StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB");
-                            }
-                            else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
+                            if (!IsImage) return ActionResult;
                         }
 
                         await question.SetColumnsWithImages(files).ConfigureAwait(false);

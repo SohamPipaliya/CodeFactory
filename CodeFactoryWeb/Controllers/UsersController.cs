@@ -1,4 +1,5 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using CodeFactoryWeb.Extra;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +17,23 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public UsersController() =>
-            client = new() { BaseAddress = Addons.HostUrl };
+            client = new() { BaseAddress = Extra.Addons.HostUrl };
 
-        public async Task<ActionResult> Index() =>
-             View(await client.GetDataAsync<IEnumerable<User>>(APIName.UsersAPI).ConfigureAwait(false));
+        public async Task<IActionResult> Index() =>
+             await this.ToActionResult(await client.GetDataAsync<IEnumerable<User>>
+                                      (APIName.UsersAPI).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
 
         public async Task<IActionResult> Details(Guid? id) =>
-             View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
+             await this.ToActionResult(await client.GetDataAsync<User>
+                                      (APIName.UsersAPI, id).ConfigureAwait(false))
+                                      .ConfigureAwait(false);
+
+        public async Task<IActionResult> Edit(Guid? id) =>
+            await Details(id).ConfigureAwait(false);
+
+        public async Task<IActionResult> Delete(Guid? id) =>
+            await Details(id).ConfigureAwait(false);
 
         public IActionResult Create() => View();
 
@@ -47,7 +58,7 @@ namespace CodeFactoryWeb.Controllers
                         data.Add(content, "file", file.FileName);
                     }
 
-                    using var response = await client.PostAsync("UsersAPI", data).ConfigureAwait(false);
+                    using var response = await client.PostAsync(APIName.UsersAPI.ToString(), data).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
@@ -67,6 +78,7 @@ namespace CodeFactoryWeb.Controllers
                 {
                     ModelState.AddModelError("", "Something went wrong");
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
                 finally
                 {
@@ -76,9 +88,6 @@ namespace CodeFactoryWeb.Controllers
             }
             return View(user);
         }
-
-        public async Task<IActionResult> Edit(Guid? id) =>
-            View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -103,7 +112,7 @@ namespace CodeFactoryWeb.Controllers
                         data.Add(content, "file", file.FileName);
                     }
 
-                    using var response = await client.PutAsync("UsersAPI/" + id, data).ConfigureAwait(false);
+                    using var response = await client.PutAsync(APIName.UsersAPI.ToString() + '/' + id, data).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                     else
@@ -123,6 +132,7 @@ namespace CodeFactoryWeb.Controllers
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
                 finally
                 {
@@ -133,8 +143,7 @@ namespace CodeFactoryWeb.Controllers
             return View(user);
         }
 
-        public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<User>(APIName.UsersAPI, id).ConfigureAwait(false));
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -143,14 +152,12 @@ namespace CodeFactoryWeb.Controllers
         {
             try
             {
-                using (var response = await client.DeleteAsync("UsersAPI/" + id).ConfigureAwait(false))
-                {
-                    if (response.IsSuccessStatusCode)
-                        return RedirectToAction(nameof(Index));
-                }
+                using var response = await client.DeleteAsync(APIName.UsersAPI.ToString() + '/' + id).ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                    return RedirectToAction(nameof(Index));
             }
             catch { }
-            return View();
+            return RedirectToAction("Error", "Error");
         }
 
         protected override void Dispose(bool disposing)

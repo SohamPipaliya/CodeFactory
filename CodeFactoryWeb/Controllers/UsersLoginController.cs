@@ -12,7 +12,7 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public UsersLoginController() =>
-            client = new() { BaseAddress = Addons.HostUrl };
+            client = new() { BaseAddress = Extra.Addons.HostUrl };
 
         public IActionResult Login() => View();
 
@@ -35,6 +35,7 @@ namespace CodeFactoryWeb.Controllers
             catch
             {
                 ModelState.AddModelError("", "Something went wrong");
+                return RedirectToAction("Error", "Error");
             }
             return View(userLogin);
         }

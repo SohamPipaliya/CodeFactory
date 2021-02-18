@@ -1,4 +1,5 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using CodeFactoryWeb.Extra;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,22 +16,25 @@ namespace CodeFactoryWeb.Controllers
         private HttpClient client;
 
         public MessagesController() =>
-            client = new() { BaseAddress = Addons.HostUrl };
+            client = new() { BaseAddress = Extra.Addons.HostUrl };
 
         public async Task<IActionResult> Index() =>
-             View(await client.GetDataAsync<IEnumerable<Message>>(APIName.MessagesAPI).ConfigureAwait(false));
+            await this.ToActionResult(await client.GetDataAsync<IEnumerable<Message>>
+                                     (APIName.MessagesAPI).ConfigureAwait(false)).ConfigureAwait(false);
 
-        public async Task<IActionResult> Details(Guid id) =>
-            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
+        public async Task<IActionResult> Details(Guid? id) =>
+            await this.ToActionResult(await client.GetDataAsync<Message>
+                                     (APIName.MessagesAPI, id).ConfigureAwait(false)).ConfigureAwait(false);
 
-        public async Task<IActionResult> Delete(Guid id) =>
-            View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
+        public async Task<IActionResult> Delete(Guid? id) =>
+            await Details(id).ConfigureAwait(false);
 
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid? id)
         {
             await SetViewBag().ConfigureAwait(false);
-            return View(await client.GetDataAsync<Message>(APIName.MessagesAPI, id).ConfigureAwait(false));
+            return await Details(id).ConfigureAwait(false);
         }
+
         public async Task<IActionResult> Create()
         {
             await SetViewBag().ConfigureAwait(false);
@@ -45,13 +49,14 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PostAsJsonAsync("MessagesAPI", message).ConfigureAwait(false);
+                    using var response = await client.PostAsJsonAsync(APIName.MessagesAPI.ToString(), message).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             await SetViewBag().ConfigureAwait(false);
@@ -66,13 +71,14 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.PutAsJsonAsync("MessagesAPI/" + id, message).ConfigureAwait(false);
+                    using var response = await client.PutAsJsonAsync(APIName.MessagesAPI.ToString() + '/' + id, message).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return RedirectToAction("Error", "Error");
                 }
             }
             await SetViewBag().ConfigureAwait(false);
@@ -87,7 +93,7 @@ namespace CodeFactoryWeb.Controllers
             {
                 try
                 {
-                    using var response = await client.DeleteAsync("MessagesAPI/" + id).ConfigureAwait(false);
+                    using var response = await client.DeleteAsync(APIName.MessagesAPI.ToString() + '/' + id).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         return RedirectToAction(nameof(Index));
                 }
@@ -96,7 +102,7 @@ namespace CodeFactoryWeb.Controllers
                     await ex.LogAsync().ConfigureAwait(false);
                 }
             }
-            return View();
+            return RedirectToAction("Error", "Error");
         }
 
         private async Task SetViewBag()

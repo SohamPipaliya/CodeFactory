@@ -2,7 +2,6 @@
 using CodeFactoryAPI.Extra;
 using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,34 +21,13 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetTags()
-        {
-            try
-            {
-                var json = SerializeToJson<IEnumerable<Tag>>(unit.GetTag.GetAll());
-                return Ok(json);
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        public async Task<IActionResult> GetTags() =>
+            await this.ToActionResult(SerializeToJson<IEnumerable<Tag>>(unit.GetTag.Model)).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetTag(Guid id)
-        {
-            try
-            {
-                var tag = await unit.GetTag.FindAsync(id).ConfigureAwait(false);
-                return tag is null ? NotFound() : Ok(SerializeToJson(tag));
-            }
-            catch (Exception ex)
-            {
-                await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        public async Task<IActionResult> GetTag(Guid id) =>
+            await this.ToActionResult(SerializeToJson<Tag>(await unit.GetTag.FindAsync(tag => tag.Tag_ID == id)
+                                                            .ConfigureAwait(false))).ConfigureAwait(false);
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutTag(Guid id, Tag tag)

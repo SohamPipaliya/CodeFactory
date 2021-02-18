@@ -1,10 +1,12 @@
 ﻿using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +28,22 @@ namespace CodeFactoryAPI.Extra
         {
             foreach (var item in columnNames)
                 value.Property(item).IsModified = true;
+        }
+        #endregion
+
+        #region IsValidImage
+        public static (bool IsImage, IActionResult ActionResult) IsValidImage(this ControllerBase controller, string name, long size)
+        {
+            var extension = name.Split('.')[^1].ToUpper();
+            var IsImage = extension is "JPG" || extension is "PNG" || extension is "JPEG";
+            var IsInSizeLimit = size > 51200 && size < 1073741825;
+
+            if (IsImage && IsInSizeLimit)
+                return (true, null);
+            else
+                return (false, IsImage
+                               ? controller.StatusCode((int)HttpStatusCode.NotAcceptable, "Image size must be between 50 KB to 1 MB")
+                               : controller.StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image"));
         }
         #endregion
 
@@ -83,6 +101,7 @@ namespace CodeFactoryAPI.Extra
             "bitch"
         };
 
+
         public static Task<string> FilterStringAsync(this string? value, char ch = ' ') => Task.Run(() =>
           {
               var sb = new StringBuilder(value ??= string.Empty);
@@ -98,7 +117,7 @@ namespace CodeFactoryAPI.Extra
         #region SetUpdatedColumn
         public async static Task SetColumnsWithImages<T>(this T value, IFormFile[] files) where T : class
         {
-            var arr = new string[5];
+            var arr = new string[files.Length];
             var extension = ".png";
 
             Question question = value as Question;
@@ -184,9 +203,6 @@ namespace CodeFactoryAPI.Extra
         public static Task<IEnumerable<T>> SetMetaDataAsync<T>(this IEnumerable<T> data, params Action<T>[] actions)
             where T : class => Task.Run(() =>
         {
-            if (data is null)
-                throw new NullReferenceException();
-
             foreach (var item in data)
                 foreach (var action in actions)
                     action(item);
@@ -196,9 +212,6 @@ namespace CodeFactoryAPI.Extra
 
         public static IEnumerable<T> SetMetaData<T>(this IEnumerable<T> data, params Action<T>[] actions) where T : class
         {
-            if (data is null)
-                throw new NullReferenceException();
-
             foreach (var item in data)
                 foreach (var action in actions)
                     action(item);
@@ -207,19 +220,15 @@ namespace CodeFactoryAPI.Extra
         }
 
         public static void SetUserState(this User user) =>
-            (user.Password, user.RegistrationDate) = (null, null);
+            (user.Password, user.RegistrationDate) = (null, default);
 
-        public static Task<T> SetMetaDataAsync<T>(this T data, params Action<T>[] actions)
-            where T : class => Task.Run(() =>
-        {
-            if (data is null)
-                throw new NullReferenceException();
+        public static Task<T> SetMetaDataAsync<T>(this T data, params Action<T>[] actions) where T : class => Task.Run(() =>
+         {
+             foreach (var action in actions)
+                 action(data);
 
-            foreach (var action in actions)
-                action(data);
-
-            return data;
-        });
+             return data;
+         });
         #endregion
 
         #region DeleteImages
@@ -227,6 +236,8 @@ namespace CodeFactoryAPI.Extra
         {
             string path;
             Question question;
+            Reply reply;
+
             if ((question = value as Question) is not null)
             {
                 if (question.Image1 is not null)
@@ -260,9 +271,7 @@ namespace CodeFactoryAPI.Extra
                         Delete(path);
                 }
             }
-
-            Reply reply;
-            if ((reply = value as Reply) is not null)
+            else if ((reply = value as Reply) is not null)
             {
                 if (reply.Image1 is not null)
                 {
@@ -301,31 +310,43 @@ namespace CodeFactoryAPI.Extra
         #region LogException
         public static Task LogAsync(this Exception value) => Task.Run(() =>
         {
-            try
-            {
-                var x = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Errors.log");
 
-                using StreamWriter writer = new(path, true) { AutoFlush = true };
+            var x = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Errors.log");
 
-                writer.WriteLine($"Date:-   {DateTime.Now}");
-                writer.WriteLine($"Exception:-   {value.Message}");
-                if (value.InnerException is not null)
-                    writer.WriteLine($"Inner Exception:-   {value.InnerException.Message}");
-                if (value.StackTrace is not null)
-                    writer.WriteLine($"StackTrace:-   {value.StackTrace.Split("   ")[^1]}");
-                writer.WriteLine();
+            using StreamWriter writer = new(path, true) { AutoFlush = true };
 
-                writer.Flush();
-                writer.Close();
-            }
-            catch { }
+            writer.WriteLine($"Date:-   {DateTime.Now}");
+            writer.WriteLine($"Exception:-   {value.Message}");
+            if (value.InnerException is not null)
+                writer.WriteLine($"Inner Exception:-   {value.InnerException.Message}");
+            if (value.StackTrace is not null)
+                writer.WriteLine($"StackTrace:-   {value.StackTrace.Split("   ")[^1]}");
+            writer.WriteLine();
+
+            writer.Flush();
+            writer.Close();
         });
         #endregion
 
         #region SerializeToJson
         public static string SerializeToJson<T>(T data/*, IJsonFormatterResolver jsonFormatterResolver = null*/) =>
-            JsonSerializer.ToJsonString(data, /*jsonFormatterResolver ?? */StandardResolver.ExcludeNull);
+                 JsonSerializer.ToJsonString(data, /*jsonFormatterResolver ?? */StandardResolver.ExcludeNull);
+        #endregion
+
+        #region ToIActionResult
+        public static async Task<IActionResult> ToActionResult(this ControllerBase controllerBase, string jsonString)
+        {
+            try
+            {
+                return controllerBase.Ok(jsonString);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return controllerBase.StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
         #endregion
     }
 

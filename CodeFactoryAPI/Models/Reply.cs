@@ -33,12 +33,14 @@ namespace CodeFactoryAPI.Models
         [DataType(DataType.DateTime)]
         public DateTime RepliedDate { get; set; }
 
+        [Required]
         public Guid? User_ID { get; set; }
 
         [ForeignKey("User_ID")]
         public User? User { get; set; }
 
-        public Guid? Question_ID { get; set; }
+        [Required]
+        public Guid Question_ID { get; set; }
 
         [ForeignKey("Question_ID")]
         public Question? Question { get; set; }
