@@ -1,11 +1,11 @@
 ﻿using CodeFactoryAPI.Extra;
+using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ namespace CodeFactoryWeb.Extra
     public static class Addons
     {
         #region HostURL
-        public static Uri HostUrl =>
+        public static readonly Uri HostUrl =
            new("https://localhost:44354/api/");
         #endregion
 
@@ -30,22 +30,29 @@ namespace CodeFactoryWeb.Extra
         #region GetDataFromAPI
         public async static Task<T?> GetDataAsync<T>(this HttpClient client, APIName url, object? id = null) where T : class
         {
-            T? t = null;
-            try
+            var uri = id == null ? url.ToString() : url + "/" + id;
+            using var response = await client.GetAsync(uri).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
             {
-                string? data = await client.GetStringAsync(id == null ? url.ToString() : url + "/" + id).ConfigureAwait(false);
-                t = Deserialize<T>(data, StandardResolver.ExcludeNull);
+                string? data = await client.GetStringAsync(uri).ConfigureAwait(false);
+                return Deserialize<T>(data, StandardResolver.ExcludeNull);
             }
-            catch { }
-            return t;
+            return null;
+        }
+
+        public async static Task<IEnumerable<User>?> GetUsersAsync(this HttpClient client, string? UserName, string? SearchBy)
+        {
+            string? jsonString = await client.GetStringAsync($"usersapi?UserName={UserName}&SearchBy={SearchBy}").ConfigureAwait(false);
+            return Deserialize<IEnumerable<User>>(jsonString, StandardResolver.ExcludeNull);
         }
         #endregion
 
-        #region ToIActionResult
-        public static async Task<IActionResult> ToActionResult<T>(this Controller controller, T data)
+        #region ToActionResult
+        public static async Task<ActionResult> ToActionResult<T>(this Controller controller, Func<Task<T?>> func)
         {
             try
             {
+                var data = await func().ConfigureAwait(false);
                 return data is null ? controller.NotFound() : controller.View(data);
             }
             catch (Exception ex)
@@ -65,11 +72,11 @@ namespace CodeFactoryWeb.Extra
         #endregion
 
         #region CustomTagHelper
-        public static IHtmlContent Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
+        public static HtmlString Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
             new HtmlString($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
 
         public static string GetImage(string? name, string directory = "Questions") =>
-            $"https://localhost:44354/files/images/{directory}/{name}";
+            name is null ? null : $"https://localhost:44354/files/images/{directory}/{name}";
         #endregion
 
         #region PostorPutAsFormData

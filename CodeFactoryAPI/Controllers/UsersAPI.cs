@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using static CodeFactoryAPI.Extra.Addons;
@@ -24,14 +25,16 @@ namespace CodeFactoryAPI.Controllers
             unit = context;
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers() =>
-            await this.ToActionResult(SerializeToJson<IEnumerable<User>>(unit.GetUser.Model)).ConfigureAwait(false);
+        public async Task<IActionResult> GetUsers([FromQuery(Name = "UserName")] string? UserName, [FromQuery(Name = "SearchBy")] string? SearchBy = "Name") =>
+            UserName is null
+            ? await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model).ConfigureAwait(false)
+            : SearchBy == "Name"
+            ? await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model.Where(user => user.UserName.Contains(UserName))).ConfigureAwait(false)
+            : await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model.Where(user => user.Email.Contains(UserName))).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetUser(Guid id) =>
-            await this.ToActionResult(SerializeToJson<User>(await unit.GetUser
-                                                        .FindAsync(user => user.User_ID == id)
-                                                        .ConfigureAwait(false))).ConfigureAwait(false);
+            await this.ToActionResult<User>(() => unit.GetUser.FindAsync(user => user.User_ID == id)).ConfigureAwait(false);
 
         [HttpPost]
         public async Task<IActionResult> PostUser([FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
@@ -40,10 +43,7 @@ namespace CodeFactoryAPI.Controllers
             {
                 try
                 {
-                    var exist = await unit.GetUser
-                                        .AnyAsync(x => x.UserName == user.UserName)
-                                        .ConfigureAwait(false);
-                    if (exist)
+                    if (await unit.GetUser.AnyAsync(x => x.UserName == user.UserName).ConfigureAwait(false))
                         return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
                     user.User_ID = Guid.NewGuid();
@@ -70,14 +70,14 @@ namespace CodeFactoryAPI.Controllers
                     }
 
                     unit.GetUser.Add(user);
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -120,19 +120,17 @@ namespace CodeFactoryAPI.Controllers
                         unit.GetUser.Context.Entry(user)
                             .SetUpdatedColumns(nameof(user.UserName), nameof(user.Password), nameof(user.Email));
 
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    if (file is not null)
                     {
-                        if (file is not null)
-                        {
-                            var model = await unit.GetUser.Model.AsNoTracking()
-                                                  .FirstAsync(x => x.User_ID == id)
-                                                  .ConfigureAwait(false);
-                            var path = ImagePath(model.Image);
-                            if (Exists(path))
-                                System.IO.File.Delete(path);
-                        }
-                        return Ok();
+                        var model = await unit.GetUser.Model.AsNoTracking()
+                                              .FirstAsync(x => x.User_ID == id)
+                                              .ConfigureAwait(false);
+                        var path = ImagePath(model.Image);
+                        if (Exists(path))
+                            System.IO.File.Delete(path);
                     }
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
@@ -143,8 +141,8 @@ namespace CodeFactoryAPI.Controllers
                         return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -161,22 +159,20 @@ namespace CodeFactoryAPI.Controllers
 
                 unit.GetUser.Remove(user);
 
-                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
+                await unit.SaveAsync().ConfigureAwait(false);
+                if (user.Image is not null)
                 {
-                    if (user.Image is not null)
-                    {
-                        var path = ImagePath(user.Image);
-                        if (Exists(path))
-                            System.IO.File.Delete(path);
-                    }
-                    return Ok();
+                    var path = ImagePath(user.Image);
+                    if (Exists(path))
+                        System.IO.File.Delete(path);
                 }
+                return Ok();
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose

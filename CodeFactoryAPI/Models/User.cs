@@ -8,7 +8,7 @@ namespace CodeFactoryAPI.Models
     public class User
     {
         [Key]
-        public Guid User_ID { get; set; }
+        public Guid? User_ID { get; set; }
 
         [Required(ErrorMessage = "UserName is Required")]
         [DataType(DataType.Text)]
@@ -28,7 +28,7 @@ namespace CodeFactoryAPI.Models
         public string Email { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime RegistrationDate { get; set; }
+        public DateTime? RegistrationDate { get; set; }
 
         [DataType(DataType.ImageUrl)]
         public string? Image { get; set; }

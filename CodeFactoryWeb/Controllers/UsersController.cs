@@ -19,15 +19,12 @@ namespace CodeFactoryWeb.Controllers
         public UsersController() =>
             client = new() { BaseAddress = Extra.Addons.HostUrl };
 
-        public async Task<IActionResult> Index() =>
-             await this.ToActionResult(await client.GetDataAsync<IEnumerable<User>>
-                                      (APIName.UsersAPI).ConfigureAwait(false))
-                                      .ConfigureAwait(false);
+        public async Task<IActionResult> Index(string? UserName, string SearchBy) =>
+            await this.ToActionResult<IEnumerable<User>>(() => client.GetUsersAsync(UserName, SearchBy));
 
         public async Task<IActionResult> Details(Guid? id) =>
-             await this.ToActionResult(await client.GetDataAsync<User>
-                                      (APIName.UsersAPI, id).ConfigureAwait(false))
-                                      .ConfigureAwait(false);
+             await this.ToActionResult<User>(() => client.GetDataAsync<User>
+                                      (APIName.UsersAPI, id)).ConfigureAwait(false);
 
         public async Task<IActionResult> Edit(Guid? id) =>
             await Details(id).ConfigureAwait(false);
@@ -59,18 +56,14 @@ namespace CodeFactoryWeb.Controllers
                     }
 
                     using var response = await client.PostAsync(APIName.UsersAPI.ToString(), data).ConfigureAwait(false);
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == HttpStatusCode.OK)
                         return RedirectToAction(nameof(Index));
                     else
                     {
-                        using var responseMessage = response.Content;
-
                         if (response.StatusCode == HttpStatusCode.AlreadyReported)
-                            ModelState.AddModelError(nameof(user.UserName), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
-                        else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
-                        else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(user.Image), await responseMessage.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(user.UserName), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                        else if (response.StatusCode == HttpStatusCode.NotAcceptable || response.StatusCode == HttpStatusCode.UnsupportedMediaType)
+                            ModelState.AddModelError(nameof(user.Image), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }
@@ -113,19 +106,16 @@ namespace CodeFactoryWeb.Controllers
                     }
 
                     using var response = await client.PutAsync(APIName.UsersAPI.ToString() + '/' + id, data).ConfigureAwait(false);
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == HttpStatusCode.OK)
                         return RedirectToAction(nameof(Index));
                     else
                     {
-                        using var responseContent = response.Content;
                         if (response.StatusCode == HttpStatusCode.AlreadyReported)
-                            ModelState.AddModelError(nameof(user.UserName), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
-                        else if (response.StatusCode == HttpStatusCode.NotAcceptable)
-                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
-                        else if (response.StatusCode == HttpStatusCode.UnsupportedMediaType)
-                            ModelState.AddModelError(nameof(user.Image), await responseContent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError(nameof(user.UserName), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                        else if (response.StatusCode == HttpStatusCode.NotAcceptable || response.StatusCode == HttpStatusCode.UnsupportedMediaType)
+                            ModelState.AddModelError(nameof(user.Image), await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                         else if (response.StatusCode == HttpStatusCode.NotFound)
-                            ModelState.AddModelError("", await responseContent.ReadAsStringAsync().ConfigureAwait(false));
+                            ModelState.AddModelError("", "No user Found");
                         else ModelState.AddModelError("", "Something went wrong");
                     }
                 }

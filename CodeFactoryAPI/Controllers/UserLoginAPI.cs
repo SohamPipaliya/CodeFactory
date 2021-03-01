@@ -24,10 +24,8 @@ namespace CodeFactoryAPI.Controllers
             {
                 user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
 
-                bool exist = await unit.GetUser
-                                       .AnyAsync(x => x.UserName == user.UserName &&
-                                                      x.Password == user.Password)
-                                       .ConfigureAwait(false);
+                bool exist = await unit.GetUser.AnyAsync(usr => usr.UserName == user.UserName &&
+                                                         usr.Password == user.Password).ConfigureAwait(false);
 
                 return exist ? Ok() : NotFound();
             }
@@ -37,6 +35,10 @@ namespace CodeFactoryAPI.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpPost("{name:alpha:length(5,25)}")]
+        public async Task<bool> Exist(string? name) =>
+            await unit.GetUser.AnyAsync(user => user.UserName == name).ConfigureAwait(false);
 
         #region Dispose
         private bool disposed = false;

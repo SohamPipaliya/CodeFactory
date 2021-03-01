@@ -40,7 +40,7 @@ namespace CodeFactoryAPI.Models
         public User? User { get; set; }
 
         [Required]
-        public Guid Question_ID { get; set; }
+        public Guid? Question_ID { get; set; }
 
         [ForeignKey("Question_ID")]
         public Question? Question { get; set; }

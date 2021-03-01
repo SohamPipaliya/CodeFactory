@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -24,21 +23,25 @@ namespace CodeFactoryAPI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetReplies() =>
-            await this.ToActionResult(SerializeToJson<IEnumerable<Reply>>(await unit.GetReply.Model
-                                                                     .Include(reply => reply.User)
-                                                                     .OrderBy(reply => reply.Message)
-                                                                     .SetMetaDataAsync(reply => reply.User.SetUserState())
-                                                                     .ConfigureAwait(false))).ConfigureAwait(false);
+            await this.ToActionResult(async () => (await unit.GetReply.Model
+                                                .OrderBy(reply => reply.Message)
+                                                .SetMetaDataAsync(replyJS => replyJS.User = unit.GetUser(replyJS.User_ID),
+                                                                  replyJS => replyJS.Question = unit.GetQuestion(replyJS.Question_ID)))
+                                                .ToRepliesJsonModels()).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetReply(Guid id) =>
-            await this.ToActionResult(SerializeToJson<Reply>(await
-                                                        (await unit.GetReply.Model
-                                                        .Include(reply => reply.User)
-                                                        .FirstAsync(reply => reply.Reply_ID == id)
-                                                        .ConfigureAwait(false))
-                                                        .SetMetaDataAsync(reply => reply.User.SetUserState())
-                                                        .ConfigureAwait(false))).ConfigureAwait(false);
+        public async Task<IActionResult> GetReply(Guid id)
+        {
+            var reply = await unit.GetReply.FindAsync(reply => reply.Reply_ID == id).ConfigureAwait(false);
+
+            if (reply is null)
+                return NotFound();
+
+            ReplyJsonModel replyJsonModel = await reply.SetMetaDataAsync(reply => reply.User = unit.GetUser(reply.User_ID),
+                                                                         reply => reply.Question = unit.GetQuestion(reply.Question_ID)).ConfigureAwait(false);
+
+            return await this.ToActionResult(() => replyJsonModel).ConfigureAwait(false);
+        }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutReply(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] Reply reply, IFormFile[]? files)
@@ -69,7 +72,7 @@ namespace CodeFactoryAPI.Controllers
 
                     var oldReply = await unit.GetReply.Model
                                    .AsNoTracking()
-                                   .FirstAsync(rpl => rpl.Reply_ID == id)
+                                   .FirstOrDefaultAsync(rpl => rpl.Reply_ID == id)
                                    .ConfigureAwait(false);
 
                     unit.GetReply.Context.Attach(reply);
@@ -77,11 +80,9 @@ namespace CodeFactoryAPI.Controllers
                                  .SetUpdatedColumns(nameof(reply.Message), nameof(reply.Code), nameof(reply.Image1), nameof(reply.Image2),
                                                     nameof(reply.Image3), nameof(reply.Image4), nameof(reply.Image5));
 
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                    {
-                        oldReply.DeleteImages();
-                        return Ok();
-                    }
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    oldReply.DeleteImages();
+                    return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -89,8 +90,8 @@ namespace CodeFactoryAPI.Controllers
                     if (!exist)
                         return NotFound();
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -121,14 +122,14 @@ namespace CodeFactoryAPI.Controllers
                 reply.Message = await reply.Message.FilterStringAsync().ConfigureAwait(false);
 
                 unit.GetReply.Add(reply);
-                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                    return Ok();
+                await unit.SaveAsync().ConfigureAwait(false);
+                return Ok();
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpDelete("{id:guid}")]
@@ -142,11 +143,9 @@ namespace CodeFactoryAPI.Controllers
                     return NotFound();
 
                 unit.GetReply.Remove(reply);
-                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                {
-                    reply.DeleteImages();
-                    return Ok();
-                }
+                await unit.SaveAsync().ConfigureAwait(false);
+                reply.DeleteImages();
+                return Ok();
             }
             catch (Exception ex)
             {

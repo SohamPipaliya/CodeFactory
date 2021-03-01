@@ -5,13 +5,18 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-
+<br />
+@using (Html.BeginForm(FormMethod.Get))
+{
+    <label>Search By :-</label>
+    @Html.DropDownList("SearchBy", new SelectListItem[] { new("UserName", "Name", true), new("Email", "Email") })
+    @Html.TextBox("UserName")
+    <input value="Search" type="submit" asp-action="Index" class="btn btn-success" />
+}
+<br />
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User_ID)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.UserName)
             </th>
@@ -35,9 +40,6 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.User_ID)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.UserName)
                 </td>
                 <td>
@@ -53,9 +55,9 @@
                     <img src="@GetImage(item.Image, directory:"Users")" height="25" width="25" alt="" />
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.User_ID }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.User_ID }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.User_ID })
+                    @Link("Edit", ControllerName.Users, ActionName.Edit, item.User_ID) |
+                    @Link("Details", ControllerName.Users, ActionName.Details, item.User_ID) |
+                    @Link("Delete", ControllerName.Users, ActionName.Delete, item.User_ID)
                 </td>
             </tr>
         }

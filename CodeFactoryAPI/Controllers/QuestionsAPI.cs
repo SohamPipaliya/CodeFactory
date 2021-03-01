@@ -24,61 +24,88 @@ namespace CodeFactoryAPI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Getquestions() =>
-            await this.ToActionResult(SerializeToJson<IEnumerable<Question>>
-                                            (await unit.GetQuestion.Model
-                                            .Include(question => question.User)
-                                            .Include(question => question.Tag1)
-                                            .Include(question => question.Tag2)
-                                            .Include(question => question.Tag3)
-                                            .Include(question => question.Tag4)
-                                            .Include(question => question.Tag5)
-                                            .Include(question => question.Messages)
-                                            .AsParallel()
-                                            .SetMetaDataAsync(question => question.User.SetUserState(),
-                                                              question => question.Replies = unit.GetReply.Model
-                                                                                .Include(reply => reply.User)
-                                                                                .AsNoTracking()
-                                                                                .Where(reply => reply.Question_ID == question.Question_ID)
-                                                                                .ToArray()
-                                                                                .SetMetaData(reply => reply.User.SetUserState()),
-                                                              question => question.Messages = unit.GetMessage.Model
-                                                                                .Include(message => message.Messeger)
-                                                                                .Include(message => message.Receiver)
-                                                                                .AsNoTracking()
-                                                                                .Where(message => message.Question_ID == question.Question_ID)
-                                                                                .ToArray()
-                                                                                .SetMetaData(message => message.Receiver.SetUserState(),
-                                                                                             message => message.Messeger.SetUserState()))
-                                            .ConfigureAwait(false))).ConfigureAwait(false);
+            await this.ToActionResult<IEnumerable<Question>>(() => unit.GetQuestion.Model
+                                           .OrderByDescending(question => question.AskedDate)
+                                           .SetMetaDataAsync(question => question.Tag1 = unit.GetTag(question.Tag1_ID),
+                                                             question => question.Tag2 = unit.GetTag(question.Tag2_ID),
+                                                             question => question.Tag3 = unit.GetTag(question.Tag3_ID),
+                                                             question => question.Tag4 = unit.GetTag(question.Tag4_ID),
+                                                             question => question.Tag5 = unit.GetTag(question.Tag5_ID),
+                                                             question => question.User = unit.GetUser(question.User_ID),
+                                                             question => question.Replies = unit.GetReply.Model
+                                                                               .Where(reply => reply.Question_ID == question.Question_ID)
+                                                                               .Select(reply => new Reply()
+                                                                               {
+                                                                                   Reply_ID = reply.Reply_ID,
+                                                                                   RepliedDate = reply.RepliedDate,
+                                                                                   Image1 = reply.Image1,
+                                                                                   Image2 = reply.Image2,
+                                                                                   Image3 = reply.Image3,
+                                                                                   Image4 = reply.Image4,
+                                                                                   Image5 = reply.Image5,
+                                                                                   User_ID = reply.User_ID,
+                                                                                   Message = reply.Message,
+                                                                                   Code = reply.Code,
+                                                                                   User = unit.GetUser(reply.User_ID)
+                                                                               }),
+                                                             question => question.Messages = unit.GetMessage.Model
+                                                                               .Where(message => message.Question_ID == question.Question_ID)
+                                                                               .Select(message => new Message()
+                                                                               {
+                                                                                   Message_ID = message.Message_ID,
+                                                                                   Messages = message.Messages,
+                                                                                   MessageDate = message.MessageDate,
+                                                                                   Messeger_ID = message.Messeger_ID,
+                                                                                   Messeger = unit.GetUser(message.Messeger_ID),
+                                                                                   Receiver_ID = message.Receiver_ID,
+                                                                                   Receiver = unit.GetUser(message.Receiver_ID)
+                                                                               })));
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetQuestion(Guid id) =>
-            await this.ToActionResult(SerializeToJson<Question>(await
-                                      (await unit.GetQuestion.Model
-                                            .Include(question => question.User)
-                                            .Include(question => question.Tag1)
-                                            .Include(question => question.Tag2)
-                                            .Include(question => question.Tag3)
-                                            .Include(question => question.Tag4)
-                                            .Include(question => question.Tag5)
-                                            .FirstAsync(question => question.Question_ID == id)
-                                            .ConfigureAwait(false))
-                                            .SetMetaDataAsync(question => question.User.SetUserState(),
-                                                              question => question.Replies = unit.GetReply.Model
-                                                                                .Include(reply => reply.User)
-                                                                                .AsNoTracking()
-                                                                                .Where(reply => reply.Question_ID == question.Question_ID)
-                                                                                .ToArray()
-                                                                                .SetMetaData(reply => reply.User.SetUserState()),
-                                                              question => question.Messages = unit.GetMessage.Model
-                                                                                .Include(message => message.Messeger)
-                                                                                .Include(message => message.Receiver)
-                                                                                .AsNoTracking()
-                                                                                .Where(message => message.Question_ID == question.Question_ID)
-                                                                                .ToArray()
-                                                                                .SetMetaData(message => message.Messeger.SetUserState(),
-                                                                                             message => message.Receiver.SetUserState()))
-                                            .ConfigureAwait(false))).ConfigureAwait(false);
+        public async Task<IActionResult> GetQuestion(Guid id)
+        {
+            var question = await unit.GetQuestion
+                                 .FindAsync(question => question.Question_ID == id)
+                                 .ConfigureAwait(false);
+            if (question is null)
+                return NotFound();
+
+            return await this.ToActionResult<Question>(() => question
+                                           .SetMetaDataAsync(question => question.Tag1 = unit.GetTag(question.Tag1_ID),
+                                                             question => question.Tag2 = unit.GetTag(question.Tag2_ID),
+                                                             question => question.Tag3 = unit.GetTag(question.Tag3_ID),
+                                                             question => question.Tag4 = unit.GetTag(question.Tag4_ID),
+                                                             question => question.Tag5 = unit.GetTag(question.Tag5_ID),
+                                                             question => question.User = unit.GetUser(question.User_ID),
+                                                             question => question.Replies = unit.GetReply.Model
+                                                                               .Where(reply => reply.Question_ID == question.Question_ID)
+                                                                               .Select(reply => new Reply()
+                                                                               {
+                                                                                   Reply_ID = reply.Reply_ID,
+                                                                                   RepliedDate = reply.RepliedDate,
+                                                                                   Image1 = reply.Image1,
+                                                                                   Image2 = reply.Image2,
+                                                                                   Image3 = reply.Image3,
+                                                                                   Image4 = reply.Image4,
+                                                                                   Image5 = reply.Image5,
+                                                                                   User_ID = reply.User_ID,
+                                                                                   Message = reply.Message,
+                                                                                   Code = reply.Code,
+                                                                                   User = unit.GetUser(reply.User_ID)
+                                                                               }),
+                                                             question => question.Messages = unit.GetMessage.Model
+                                                                              .Where(message => message.Question_ID == question.Question_ID)
+                                                                              .Select(message => new Message()
+                                                                              {
+                                                                                  Message_ID = message.Message_ID,
+                                                                                  Messages = message.Messages,
+                                                                                  MessageDate = message.MessageDate,
+                                                                                  Messeger_ID = message.Messeger_ID,
+                                                                                  Messeger = unit.GetUser(message.Messeger_ID),
+                                                                                  Receiver_ID = message.Receiver_ID,
+                                                                                  Receiver = unit.GetUser(message.Receiver_ID)
+                                                                              })));
+        }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutQuestion(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] Question question, IFormFile[]? files)
@@ -119,11 +146,9 @@ namespace CodeFactoryAPI.Controllers
                                            nameof(question.Tag1_ID), nameof(question.Tag2_ID), nameof(question.Tag3_ID), nameof(question.Tag4_ID),
                                            nameof(question.Tag5_ID));
 
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                    {
-                        oldQuestion.DeleteImages();
-                        return Ok();
-                    }
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    oldQuestion.DeleteImages();
+                    return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -133,8 +158,8 @@ namespace CodeFactoryAPI.Controllers
                         return NotFound();
                     else
                         await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -168,14 +193,14 @@ namespace CodeFactoryAPI.Controllers
                     question.Title = await question.Title.FilterStringAsync().ConfigureAwait(false);
 
                     unit.GetQuestion.Add(question);
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -188,22 +213,20 @@ namespace CodeFactoryAPI.Controllers
                 var question = await unit.GetQuestion.FindAsync(question => question.Question_ID == id)
                                                      .ConfigureAwait(false);
 
-                if (question == null)
+                if (question is null)
                     return NotFound();
 
                 unit.GetQuestion.Remove(question);
 
-                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                {
-                    question.DeleteImages();
-                    return Ok();
-                }
+                await unit.SaveAsync().ConfigureAwait(false);
+                question.DeleteImages();
+                return Ok();
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose

@@ -11,7 +11,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.RepliedDate)
+                @Html.DisplayNameFor(model => model.Message)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.User)
@@ -27,13 +27,13 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.RepliedDate)
+                    @Html.DisplayFor(modelItem => item.Message)
                 </td>
                 <td>
-                    @Link("Go to", ControllerName.Users, ActionName.Details, item.User_ID)
+                    @Link($"{item.User?.Email}", ControllerName.Users, ActionName.Details, item.User_ID)
                 </td>
                 <td>
-                    @Link("Go to", ControllerName.Questions, ActionName.Details, item.Question_ID)
+                    @Link($"{item.Question?.Title}", ControllerName.Questions, ActionName.Details, item.Question_ID)
                 </td>
                 <td>
                     @Link("Edit", ControllerName.Replies, ActionName.Edit, item.Reply_ID) |

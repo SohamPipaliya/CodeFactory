@@ -23,12 +23,10 @@ namespace CodeFactoryWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    using var content = await userLogin.ParseToStringContentAsync();
-                    using var response = await client.PostAsync("UserLoginAPI", content);
+                    using var content = await userLogin.ParseToStringContentAsync().ConfigureAwait(false);
+                    using var response = await client.PostAsync("UserLoginAPI", content).ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
-                        return RedirectToAction("Index", nameof(QuestionsController));
-                    //else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    //    ModelState.AddModelError("", "Invalid Username or password");
+                        return RedirectToAction("Index", "Questions");
                     else ModelState.AddModelError("", "Invalid Username or password");
                 }
             }

@@ -19,6 +19,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Receiver)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Question)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -30,10 +33,13 @@
                     @Html.DisplayFor(modelItem => item.Messages)
                 </td>
                 <td>
-                    @Link("Go to", ControllerName.Users, ActionName.Details, item.Messeger_ID)
+                    @Link($"{item.Messeger?.Email}", ControllerName.Users, ActionName.Details, item.Messeger_ID)
                 </td>
                 <td>
-                    @Link("Go to", ControllerName.Users, ActionName.Details, item.Receiver_ID)
+                    @Link($"{item.Receiver?.Email}", ControllerName.Users, ActionName.Details, item.Receiver_ID)
+                </td>
+                <td>
+                    @Link("Go to Question", ControllerName.Questions, ActionName.Details, item.Question_ID)
                 </td>
                 <td>
                     @Link("Edit", ControllerName.Messages, ActionName.Edit, item.Message_ID) |

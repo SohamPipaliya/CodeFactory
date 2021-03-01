@@ -1,5 +1,3 @@
-using System;
-
 namespace CodeFactoryAPI.Models
 {
     public class ErrorViewModel

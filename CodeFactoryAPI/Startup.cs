@@ -1,6 +1,8 @@
 using CodeFactoryAPI.DAL;
+using CodeFactoryAPI.Extra;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,25 @@ namespace CodeFactoryAPI
         public Startup(IConfiguration configuration) =>
             Configuration = configuration;
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  configurePolicy: builder =>
+                                  {
+                                      builder.WithOrigins("https://localhost:44366")
+                                             .AllowAnyHeader()
+                                             .AllowAnyMethod();
+                                  });
+            });
+            services.AddControllers().AddJsonOptions(option =>
+            {
+                option.JsonSerializerOptions.IgnoreNullValues = true;
+                option.JsonSerializerOptions.PropertyNamingPolicy = new PascalCase();
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CodeFactoryAPI", Version = "v1" });
@@ -33,7 +51,7 @@ namespace CodeFactoryAPI
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CodeFactoryAPI v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CodeFactoryAPI"));
             }
 
             app.UseHttpsRedirection();
@@ -42,12 +60,16 @@ namespace CodeFactoryAPI
 
             app.UseRouting();
 
+            app.UseCors(MyAllowSpecificOrigins);
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            app.Run(context => context.Response.WriteAsync("CodeFactory"));
         }
     }
 }

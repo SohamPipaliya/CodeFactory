@@ -12,7 +12,7 @@
             <div class="form-group">
                 <label asp-for="UserName" class="control-label"></label>
                 <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
+                <span asp-validation-for="UserName" class="text-danger" id="error"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
@@ -39,7 +39,37 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $('#UserName').keyup(function () {
+                var username = $(this).val();
+                var oldusername = '@Model.UserName';
+                if (username.length > 4 && username != oldusername) {
+                    $.ajax({
+                        url: 'https://localhost:44354/api/UserLoginAPI/' + username,
+                        method: 'post',
+                        //data: { name: username },
+                        dataType: 'json',
+                        success: function (data) {
+                            var div = $('#error');
 
+                            if (data) {
+                                div.text(username + ' is already taken');
+                                div.css('color', 'Red');
+                            }
+                            else {
+                                div.text('');
+                            }
+                        }//,
+                        //error: function (err) {
+                        //    alert(err);
+                        //}
+                    });
+                }
+            });
+        });
+</script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

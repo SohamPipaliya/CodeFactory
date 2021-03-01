@@ -64,8 +64,8 @@ namespace CodeFactoryAPI.Models
         [ForeignKey("Tag5_ID")]
         public Tag? Tag5 { get; set; }
 
-        public IEnumerable<Reply>? Replies { get; set; }
+        public IEnumerable<Reply?>? Replies { get; set; }
 
-        public IEnumerable<Message>? Messages { get; set; }
+        public IEnumerable<Message?>? Messages { get; set; }
     }
 }

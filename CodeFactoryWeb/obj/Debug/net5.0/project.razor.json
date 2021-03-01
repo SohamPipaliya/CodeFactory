@@ -15673,6 +15673,11 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Shared\\NotFound.cshtml",
+      "TargetPath": "Views\\Shared\\NotFound.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Users\\Details.cshtml",
       "TargetPath": "Views\\Users\\Details.cshtml",
       "FileKind": "mvc"
@@ -15680,6 +15685,11 @@
     {
       "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Tags\\Delete.cshtml",
       "TargetPath": "Views\\Tags\\Delete.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "c:\\Users\\SOHAM\\Desktop\\Git\\CodeFactory\\CodeFactoryWeb\\Views\\Shared\\Error.cshtml",
+      "TargetPath": "Views\\Shared\\Error.cshtml",
       "FileKind": "mvc"
     },
     {

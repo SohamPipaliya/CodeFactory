@@ -1,10 +1,6 @@
 ﻿using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CodeFactoryWeb.Controllers
 {
@@ -13,6 +9,14 @@ namespace CodeFactoryWeb.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [Route("Error/{statuscode}")]
+        public IActionResult StatusCodeResult(int statuscode)
+        {
+            if (statuscode is not 400)
+                return View();
+            return View("NotFound");
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿@model CodeFactoryAPI.Models.User
 
 <title>Create-User</title>
-
-<h4>User</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -11,7 +9,7 @@
             <div class="form-group">
                 <label asp-for="UserName" class="control-label"></label>
                 <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
+                <span asp-validation-for="UserName" class="text-danger" id="error"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
@@ -38,7 +36,36 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#UserName').keyup(function () {
+            var username = $(this).val();
+            if (username.length > 4) {
+                $.ajax({
+                    url: 'https://localhost:44354/api/UserLoginAPI/' + username,
+                    method: 'post',
+                    //data: { name: username },
+                    dataType: 'json',
+                    success: function (data) {
+                        var div = $('#error');
 
+                        if (data) {
+                            div.text(username + ' is already taken');
+                            div.css('color', 'Red');
+                        }
+                        else {
+                            div.text('');
+                        }
+                    }//,
+                    //error: function (err) {
+                    //    alert(err);
+                    //}
+                });
+            }
+        });
+    });
+</script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

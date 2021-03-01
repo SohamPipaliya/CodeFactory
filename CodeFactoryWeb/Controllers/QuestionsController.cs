@@ -20,14 +20,12 @@ namespace CodeFactoryWeb.Controllers
             client = new() { BaseAddress = Extra.Addons.HostUrl };
 
         public async Task<IActionResult> Index() =>
-             await this.ToActionResult(await client.GetDataAsync<IEnumerable<Question>>
-                                      (APIName.QuestionsAPI).ConfigureAwait(false))
-                                      .ConfigureAwait(false);
+             await this.ToActionResult<IEnumerable<Question>>(() => client.GetDataAsync<IEnumerable<Question>>
+                                      (APIName.QuestionsAPI)).ConfigureAwait(false);
 
         public async Task<IActionResult> Details(Guid? id) =>
-             await this.ToActionResult(await client.GetDataAsync<Question>
-                                      (APIName.QuestionsAPI, id).ConfigureAwait(false))
-                                      .ConfigureAwait(false);
+             await this.ToActionResult<Question>(() => client.GetDataAsync<Question>
+                                      (APIName.QuestionsAPI, id)).ConfigureAwait(false);
 
         public async Task<IActionResult> Delete(Guid? id) =>
             await Details(id).ConfigureAwait(false);

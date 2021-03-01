@@ -20,13 +20,13 @@
             @Html.DisplayNameFor(model => model.Messeger)
         </dt>
         <dd class="col-sm-10">
-            @Link("Go to", ControllerName.Users, ActionName.Details, Model.Messeger_ID)
+            @Link($"{Model.Messeger?.Email}", ControllerName.Users, ActionName.Details, Model.Messeger_ID)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Receiver)
         </dt>
         <dd class="col-sm-10">
-            @Link("Go to", ControllerName.Users, ActionName.Details, Model.Receiver_ID)
+            @Link($"{Model.Receiver?.Email}", ControllerName.Users, ActionName.Details, Model.Messeger_ID)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Question)

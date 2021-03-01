@@ -1,0 +1,41 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebApplication</title>
+    <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <input type="submit" id="dataload" value="Show" onclick="GetData()" />
+    <label id="foo"></label>
+</body>
+</html>
+<script src="lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+    function GetData() {
+        $.ajax({
+            url: 'https://localhost:44354/api/UsersAPI',
+            method: 'get',
+            dataType: 'json',
+            success: function (data) {
+                var it = $("#foo");
+                it.empty();
+                for (let user of data) {
+                    it.append(user.UserName);
+                    it.append("<br />");
+                    it.append(user.Email);
+                    it.append("<br />");
+                    it.append(user.Password);
+                    it.append("<br />");
+                    it.append(user.RegistrationDate);
+                    it.append("<br />");
+                    it.append(user.Image);
+                    it.append("<br />");
+                    it.append("<br />");
+                }
+            }
+        });
+    }
+</script>

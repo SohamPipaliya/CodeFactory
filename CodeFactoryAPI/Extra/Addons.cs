@@ -1,4 +1,5 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.DAL;
+using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -6,12 +7,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Utf8Json;
-using Utf8Json.Resolvers;
 using static System.IO.File;
 
 namespace CodeFactoryAPI.Extra
@@ -199,6 +200,41 @@ namespace CodeFactoryAPI.Extra
         }
         #endregion
 
+        #region GetData
+        public static User? GetUser(this UnitOfWork unit, Guid? id) =>
+            unit.GetUser.Model.Where(user => user.User_ID == id)
+                .Select(us => new User() { UserName = us.UserName, Email = us.Email, Image = us.Image }).FirstOrDefault();
+
+        public static Tag? GetTag(this UnitOfWork unit, Guid? id) =>
+            unit.GetTag.Model.Where(tag => tag.Tag_ID == id)
+                .Select(tag => new Tag() { Name = tag.Name }).FirstOrDefault();
+
+        public static Question? GetQuestion(this UnitOfWork unit, Guid? id)
+        {
+            var question = unit.GetQuestion.Find(id);
+
+            if (question is null)
+                return null;
+
+            question.Tag1 = unit.GetTag(question.Tag1_ID);
+            question.Tag2 = unit.GetTag(question.Tag2_ID);
+            question.Tag3 = unit.GetTag(question.Tag3_ID);
+            question.Tag4 = unit.GetTag(question.Tag4_ID);
+            question.Tag5 = unit.GetTag(question.Tag5_ID);
+            question.User = unit.GetUser(question.User_ID);
+
+            return question;
+        }
+        #endregion
+
+        #region ToJsonModel
+        public static IEnumerable<ReplyJsonModel> ToRepliesJsonModels(this IEnumerable<Reply> replies)
+        {
+            foreach (var item in replies)
+                yield return new(item);
+        }
+        #endregion
+
         #region SetMetaData
         public static Task<IEnumerable<T>> SetMetaDataAsync<T>(this IEnumerable<T> data, params Action<T>[] actions)
             where T : class => Task.Run(() =>
@@ -330,21 +366,42 @@ namespace CodeFactoryAPI.Extra
         #endregion
 
         #region SerializeToJson
-        public static string SerializeToJson<T>(T data/*, IJsonFormatterResolver jsonFormatterResolver = null*/) =>
-                 JsonSerializer.ToJsonString(data, /*jsonFormatterResolver ?? */StandardResolver.ExcludeNull);
+        //public static string SerializeToJson<T>(T data/*, IJsonFormatterResolver jsonFormatterResolver = null*/) =>
+        //         JsonSerializer.ToJsonString(data, /*jsonFormatterResolver ?? */StandardResolver.ExcludeNull);
         #endregion
 
         #region ToIActionResult
-        public static async Task<IActionResult> ToActionResult(this ControllerBase controllerBase, string jsonString)
+        public static async Task<ActionResult> ToActionResult<T>(this ControllerBase controllerBase, Func<T?> func) where T : class
         {
             try
             {
-                return controllerBase.Ok(jsonString);
+                var data = func();
+                if (data is null)
+                    return controllerBase.NotFound();
+
+                return controllerBase.Ok(data);
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
-                return controllerBase.StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                return controllerBase.StatusCode(500, ex.Message);
+            }
+        }
+
+        public static async Task<ActionResult> ToActionResult<T>(this ControllerBase controllerBase, Func<Task<T?>> func) where T : class
+        {
+            try
+            {
+                var data = await func().ConfigureAwait(false);
+                if (data is null)
+                    return controllerBase.NotFound();
+
+                return controllerBase.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync().ConfigureAwait(false);
+                return controllerBase.StatusCode(500, ex.Message);
             }
         }
         #endregion
@@ -369,5 +426,11 @@ namespace CodeFactoryAPI.Extra
             }
             return Task.CompletedTask;
         }
+    }
+
+    public class PascalCase : JsonNamingPolicy
+    {
+        public override string ConvertName(string name) => char.ToUpper(name[0]) + name.Substring(1);
+
     }
 }

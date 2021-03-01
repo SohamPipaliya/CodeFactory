@@ -8,7 +8,7 @@ namespace CodeFactoryAPI.Models
     public class Tag
     {
         [Key]
-        public Guid Tag_ID { get; set; }
+        public Guid? Tag_ID { get; set; }
 
         [Required]
         public string Name { get; set; }

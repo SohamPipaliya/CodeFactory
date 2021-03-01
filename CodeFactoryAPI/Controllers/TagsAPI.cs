@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using static CodeFactoryAPI.Extra.Addons;
@@ -22,12 +23,11 @@ namespace CodeFactoryAPI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetTags() =>
-            await this.ToActionResult(SerializeToJson<IEnumerable<Tag>>(unit.GetTag.Model)).ConfigureAwait(false);
+            await this.ToActionResult<IEnumerable<Tag>>(() => unit.GetTag.Model.OrderBy(tag => tag.Name)).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetTag(Guid id) =>
-            await this.ToActionResult(SerializeToJson<Tag>(await unit.GetTag.FindAsync(tag => tag.Tag_ID == id)
-                                                            .ConfigureAwait(false))).ConfigureAwait(false);
+            await this.ToActionResult<Tag>(() => unit.GetTag.FindAsync(tag => tag.Tag_ID == id)).ConfigureAwait(false);
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutTag(Guid id, Tag tag)
@@ -40,8 +40,8 @@ namespace CodeFactoryAPI.Controllers
                 try
                 {
                     unit.GetTag.Update(tag);
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -49,8 +49,8 @@ namespace CodeFactoryAPI.Controllers
                     if (!exist)
                         return NotFound();
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -64,14 +64,14 @@ namespace CodeFactoryAPI.Controllers
                 {
                     tag.Tag_ID = Guid.NewGuid();
                     unit.GetTag.Add(tag);
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -87,14 +87,14 @@ namespace CodeFactoryAPI.Controllers
 
                 unit.GetTag.Remove(tag);
 
-                if (await unit.SaveAsync() > 0)
-                    return Ok();
+                await unit.SaveAsync().ConfigureAwait(false);
+                return Ok();
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose

@@ -1,0 +1,20 @@
+Date:-   28-02-2021 03:16:11 PM
+Exception:-   expected:'{', actual:'[', at offset:0
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   28-02-2021 03:16:12 PM
+Exception:-   expected:'{', actual:'[', at offset:0
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   28-02-2021 03:16:18 PM
+Exception:-   expected:'{', actual:'[', at offset:0
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   28-02-2021 05:14:26 PM
+Exception:-   expected:'[', actual:'{', at offset:0
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   28-02-2021 05:36:10 PM
+Exception:-   expected:'{', actual:'[', at offset:0
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+

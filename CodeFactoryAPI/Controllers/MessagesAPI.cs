@@ -23,15 +23,23 @@ namespace CodeFactoryAPI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetMessages() =>
-            await this.ToActionResult(SerializeToJson<IEnumerable<Message>>(unit.GetMessage.Model
-                                                                   .OrderBy(message => message.Messages)))
-                                                                   .ConfigureAwait(false);
+             await this.ToActionResult<IEnumerable<Message>>(() => unit.GetMessage.Model
+                                                 .OrderBy(message => message.Messages)
+                                                 .SetMetaDataAsync(message => message.Messeger = unit.GetUser(message.Messeger_ID),
+                                                                   message => message.Receiver = unit.GetUser(message.Receiver_ID))).ConfigureAwait(false);
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetMessage(Guid id) =>
-                 await this.ToActionResult(SerializeToJson<Message>(await unit.GetMessage.Model
-                                                                 .FirstAsync(message => message.Message_ID == id)
-                                                                 .ConfigureAwait(false))).ConfigureAwait(false);
+        public async Task<IActionResult> GetMessage(Guid id)
+        {
+            var message = await unit.GetMessage
+                                    .FindAsync(message => message.Message_ID == id).ConfigureAwait(false);
+            if (message is null)
+                return NotFound();
+
+            return await this.ToActionResult<Message>(() => message.SetMetaDataAsync(
+                message => message.Messeger = unit.GetUser(message.Messeger_ID),
+                message => message.Receiver = unit.GetUser(message.Receiver_ID)));
+        }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> PutMessage(Guid id, Message message)
@@ -48,17 +56,16 @@ namespace CodeFactoryAPI.Controllers
                     unit.GetUser.Context.Entry(message)
                         .SetUpdatedColumns(nameof(message.Messages));
 
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    bool exist = await unit.GetMessage.AnyAsync(message => message.Message_ID == id).ConfigureAwait(false);
-                    if (!exist)
+                    if (!await unit.GetMessage.AnyAsync(message => message.Message_ID == id).ConfigureAwait(false))
                         return NotFound();
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -74,14 +81,14 @@ namespace CodeFactoryAPI.Controllers
                     message.MessageDate = DateTime.Now;
 
                     unit.GetMessage.Add(message);
-                    if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                        return Ok();
+                    await unit.SaveAsync().ConfigureAwait(false);
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
@@ -91,15 +98,23 @@ namespace CodeFactoryAPI.Controllers
         {
             try
             {
-                await unit.GetMessage.RemoveAsync(id).ConfigureAwait(false);
-                if (await unit.SaveAsync().ConfigureAwait(false) > 0)
-                    return Ok();
+                var message = await unit.GetMessage.FindAsync(msg => msg.Message_ID == id).ConfigureAwait(false);
+
+                if (message is null)
+                    return NotFound();
+
+                unit.GetMessage.Remove(message);
+
+                await unit.SaveAsync().ConfigureAwait(false);
+                return Ok();
             }
             catch (Exception ex)
             {
+                if (!await unit.GetMessage.AnyAsync(message => message.Message_ID == id).ConfigureAwait(false))
+                    return NotFound();
                 await ex.LogAsync().ConfigureAwait(false);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose

@@ -30,27 +30,27 @@ namespace CodeFactoryAPI.DAL
         public bool Any(Expression<Func<T, bool>> predicate) =>
             model.Any(predicate);
 
-        public T Find(object PKey) =>
+        public T? Find(object PKey) =>
             model.Find(PKey);
 
-        public T Find(Expression<Func<T, bool>> predicate) =>
+        public T? Find(Expression<Func<T, bool>> predicate) =>
             model.Find(predicate);
 
         public ValueTask<T> FindAsync(object PKey) =>
             model.FindAsync(PKey);
 
-        public Task<T> FindAsync(Expression<Func<T, bool>> predicate) =>
-            model.FirstAsync(predicate);
+        public Task<T?> FindAsync(Expression<Func<T, bool>> predicate) =>
+            model.FirstOrDefaultAsync(predicate);
 
         public IEnumerable<T> GetAll() => model;
 
         public Task<T[]> GetAllAsync() =>
              model.ToArrayAsync();
 
-        public async Task<T?> RemoveAsync(object id) =>
+        public async Task<T> RemoveAsync(object id) =>
             model.Remove(await FindAsync(id).ConfigureAwait(false)).Entity;
 
-        public T? Remove(T entity) =>
+        public T Remove(T entity) =>
             model.Remove(entity).Entity;
 
         public int Save() =>

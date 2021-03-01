@@ -459,6 +459,8 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Vie
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Details.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Edit.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Replies\Index.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Shared\Error.cshtml.g.cs
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Shared\NotFound.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Shared\_Layout.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Shared\_ValidationScriptsPartial.cshtml.g.cs
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Tags\Create.cshtml.g.cs
@@ -482,4 +484,3 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFacto
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\ref\CodeFactoryWeb.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.pdb
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\CodeFactoryWeb.genruntimeconfig.cache
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\obj\Debug\net5.0\Razor\Views\Shared\Error.cshtml.g.cs
