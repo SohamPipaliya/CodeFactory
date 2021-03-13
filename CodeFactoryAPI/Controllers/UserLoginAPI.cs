@@ -1,7 +1,9 @@
 ﻿using CodeFactoryAPI.DAL;
 using CodeFactoryAPI.Extra;
 using CodeFactoryAPI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,22 +14,23 @@ namespace CodeFactoryAPI.Controllers
     [ApiController]
     public class UserLoginAPI : ControllerBase, IDisposable
     {
-        private UnitOfWork unit;
 
-        public UserLoginAPI(Context context) =>
-            unit = context;
+        private SignInManager<User> signInManager;
+
+        public UserLoginAPI(SignInManager<User> signInManager)
+        {
+            this.signInManager = signInManager;
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserLogin user)
+        public async Task<IActionResult> Post(UserLogin userLogin)
         {
             try
             {
-                user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
-
-                bool exist = await unit.GetUser.AnyAsync(usr => usr.UserName == user.UserName &&
-                                                         usr.Password == user.Password).ConfigureAwait(false);
-
-                return exist ? Ok() : NotFound();
+                var result = await signInManager.PasswordSignInAsync(userLogin.UserName, userLogin.Password, true, false);
+                if (result.Succeeded)
+                    return Ok();
+                return BadRequest();
             }
             catch (Exception ex)
             {
@@ -38,7 +41,7 @@ namespace CodeFactoryAPI.Controllers
 
         [HttpPost("{name:alpha:length(5,25)}")]
         public async Task<bool> Exist(string? name) =>
-            await unit.GetUser.AnyAsync(user => user.UserName == name).ConfigureAwait(false);
+            await signInManager.UserManager.Users.AnyAsync(user => user.UserName == name).ConfigureAwait(false);
 
         #region Dispose
         private bool disposed = false;
@@ -56,9 +59,7 @@ namespace CodeFactoryAPI.Controllers
             {
                 if (disposing)
                 {
-                    unit.Dispose();
                 }
-                unit = null;
                 disposed = true;
             }
         }

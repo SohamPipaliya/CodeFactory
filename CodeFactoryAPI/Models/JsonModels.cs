@@ -44,9 +44,9 @@ namespace CodeFactoryAPI.Models
 
         public DateTime RepliedDate { get; set; }
 
-        public Guid? User_ID { get; set; }
+        public string? User_ID { get; set; }
 
-        public User? User { get; set; }
+        public UserViewModel? User { get; set; }
 
         public Guid? Question_ID { get; set; }
 
@@ -92,9 +92,9 @@ namespace CodeFactoryAPI.Models
 
         public DateTime AskedDate { get; set; }
 
-        public Guid? User_ID { get; set; }
+        public string? User_ID { get; set; }
 
-        public User? User { get; set; }
+        public UserViewModel? User { get; set; }
 
         public Guid? Tag1_ID { get; set; }
 

@@ -201,9 +201,9 @@ namespace CodeFactoryAPI.Extra
         #endregion
 
         #region GetData
-        public static User? GetUser(this UnitOfWork unit, Guid? id) =>
-            unit.GetUser.Model.Where(user => user.User_ID == id)
-                .Select(us => new User() { UserName = us.UserName, Email = us.Email, Image = us.Image }).FirstOrDefault();
+        public static UserViewModel? GetUser(this UnitOfWork unit, string id) =>
+            unit.GetUser.Model.Where(user => user.Id == id)
+                .Select(us => new UserViewModel() { UserName = us.UserName, Email = us.Email, Image = us.Image }).FirstOrDefault();
 
         public static Tag? GetTag(this UnitOfWork unit, Guid? id) =>
             unit.GetTag.Model.Where(tag => tag.Tag_ID == id)
@@ -255,8 +255,8 @@ namespace CodeFactoryAPI.Extra
             return data;
         }
 
-        public static void SetUserState(this User user) =>
-            (user.Password, user.RegistrationDate) = (null, default);
+        //public static void SetUserState(this User user) =>
+        //    (user.Password, user.RegistrationDate) = (null, default);
 
         public static Task<T> SetMetaDataAsync<T>(this T data, params Action<T>[] actions) where T : class => Task.Run(() =>
          {
@@ -405,6 +405,14 @@ namespace CodeFactoryAPI.Extra
             }
         }
         #endregion
+
+        public static IEnumerable<UserViewModel> AsUserViewmodel(this IEnumerable<User> users)
+        {
+            foreach (var item in users)
+            {
+                yield return new(item);
+            }
+        }
     }
 
     public class FormDataModelBinder : IModelBinder

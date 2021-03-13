@@ -1,17 +1,13 @@
 ﻿using CodeFactoryAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodeFactoryAPI.DAL
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User>
     {
         public Context(DbContextOptions<Context> optionsBuilder) : base(optionsBuilder)
-        {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
-        }
-
-        public DbSet<User> Users { get; set; }
+        { }
 
         public DbSet<Question> Questions { get; set; }
 

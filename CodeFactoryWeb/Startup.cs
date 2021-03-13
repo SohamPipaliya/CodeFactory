@@ -1,3 +1,4 @@
+using CodeFactoryAPI.Extra;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,13 @@ namespace CodeFactoryWeb
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                    .AddJsonOptions(option =>
+                    {
+                        option.JsonSerializerOptions.IgnoreNullValues = true;
+                        option.JsonSerializerOptions.PropertyNamingPolicy = new PascalCase();
+                    })
+                    .AddXmlSerializerFormatters();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -26,9 +33,9 @@ namespace CodeFactoryWeb
             }
             else
             {
-                //app.UseExceptionHandler("/Home/Error");
-                //app.UseHsts();
-                app.UseStatusCodePagesWithReExecute("/Error/{0 }");
+                app.UseHsts();
+                app.UseExceptionHandler("/Error/error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }
             app.UseHttpsRedirection();
 

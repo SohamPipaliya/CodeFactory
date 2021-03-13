@@ -1,5 +1,8 @@
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.Views.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.Views.pdb
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.deps.json
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.runtimeconfig.json
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.runtimeconfig.dev.json
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryAPI.exe
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\appsettings.Development.json
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\appsettings.json
@@ -27,8 +30,6 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Micr
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.Connections.Abstractions.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.CookiePolicy.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.Cors.dll
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.Cryptography.Internal.dll
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.DataProtection.Abstractions.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.DataProtection.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.AspNetCore.DataProtection.Extensions.dll
@@ -113,8 +114,6 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Micr
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Hosting.Abstractions.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Hosting.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Http.dll
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Identity.Core.dll
-C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Identity.Stores.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Localization.Abstractions.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Localization.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Microsoft.Extensions.Logging.Abstractions.dll
@@ -295,6 +294,9 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\refs\Wind
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryWeb.Views.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\CodeFactoryWeb.Views.pdb
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Humanizer.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.AspNetCore.Razor.Language.dll
@@ -314,6 +316,8 @@ C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.SqlServer.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.Extensions.Identity.Core.dll
+C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.Extensions.Identity.Stores.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.Identity.Client.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\bin\Debug\net5.0\Microsoft.IdentityModel.Logging.dll

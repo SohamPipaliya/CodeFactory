@@ -18,3 +18,27 @@ Date:-   28-02-2021 05:36:10 PM
 Exception:-   expected:'{', actual:'[', at offset:0
 StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
 
+Date:-   05-03-2021 03:37:37 PM
+Exception:-   Object reference not set to an instance of an object.
+StackTrace:-   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.<Invoke>g__Awaited|6_0(ExceptionHandlerMiddleware middleware, HttpContext context, Task task)
+
+Date:-   05-03-2021 03:40:55 PM
+Exception:-   Object reference not set to an instance of an object.
+StackTrace:-   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.<Invoke>g__Awaited|6_0(ExceptionHandlerMiddleware middleware, HttpContext context, Task task)
+
+Date:-   09-03-2021 09:49:07 PM
+Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   09-03-2021 09:53:38 PM
+Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   09-03-2021 09:53:43 PM
+Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+
+Date:-   09-03-2021 10:07:48 PM
+Exception:-   Response status code does not indicate success: 500 (Internal Server Error).
+StackTrace:-   at CodeFactoryWeb.Extra.Addons.ToActionResult[T](Controller controller, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryWeb\Extra\Addons.cs:line 55
+

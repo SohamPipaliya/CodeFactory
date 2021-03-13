@@ -1,22 +1,30 @@
-﻿using CodeFactoryAPI.Models;
+﻿using CodeFactoryAPI.Extra;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CodeFactoryWeb.Controllers
 {
+    [Route("Error")]
     public class ErrorController : Controller
     {
-        public IActionResult Error()
+        [Route("{statuscode}")]
+        public async Task<IActionResult> StatusCodeResult(int statuscode)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (statuscode is 404)
+                return View("NotFound");
+            if (statuscode is 500)
+                return await Error().ConfigureAwait(false);
+            return View();
         }
 
-        [Route("Error/{statuscode}")]
-        public IActionResult StatusCodeResult(int statuscode)
+        [Route("Error")]
+        public async Task<IActionResult> Error()
         {
-            if (statuscode is not 400)
-                return View();
-            return View("NotFound");
+            var exception = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            if (exception is not null)
+                await exception.Error.LogAsync().ConfigureAwait(false);
+            return View("Error");
         }
     }
 }

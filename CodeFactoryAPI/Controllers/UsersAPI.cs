@@ -1,7 +1,7 @@
-﻿using CodeFactoryAPI.DAL;
-using CodeFactoryAPI.Extra;
+﻿using CodeFactoryAPI.Extra;
 using CodeFactoryAPI.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,36 +19,36 @@ namespace CodeFactoryAPI.Controllers
     [ApiController]
     public class UsersAPI : ControllerBase, IDisposable
     {
-        private UnitOfWork unit;
+        private UserManager<User> userManager;
 
-        public UsersAPI(Context context) =>
-            unit = context;
+        public UsersAPI(UserManager<User> userManager) =>
+            (this.userManager) = (userManager);
 
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery(Name = "UserName")] string? UserName, [FromQuery(Name = "SearchBy")] string? SearchBy = "Name") =>
             UserName is null
-            ? await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model).ConfigureAwait(false)
+            ? await this.ToActionResult(() => userManager.Users.AsUserViewmodel()).ConfigureAwait(false)
             : SearchBy == "Name"
-            ? await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model.Where(user => user.UserName.Contains(UserName))).ConfigureAwait(false)
-            : await this.ToActionResult<IEnumerable<User>>(() => unit.GetUser.Model.Where(user => user.Email.Contains(UserName))).ConfigureAwait(false);
+            ? await this.ToActionResult(() => userManager.Users.Where(user => user.UserName.Contains(UserName)).AsUserViewmodel()).ConfigureAwait(false)
+            : await this.ToActionResult(() => userManager.Users.Where(user => user.Email.Contains(UserName)).AsUserViewmodel()).ConfigureAwait(false);
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetUser(Guid id) =>
-            await this.ToActionResult<User>(() => unit.GetUser.FindAsync(user => user.User_ID == id)).ConfigureAwait(false);
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(string id) =>
+            await this.ToActionResult<UserViewModel>(() => new UserViewModel(userManager.Users.FirstOrDefault(user => user.Id == id))).ConfigureAwait(false);
 
         [HttpPost]
-        public async Task<IActionResult> PostUser([FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
+        public async Task<IActionResult> PostUser([FromForm][ModelBinder(typeof(FormDataModelBinder))] UserViewModel userView, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    if (await unit.GetUser.AnyAsync(x => x.UserName == user.UserName).ConfigureAwait(false))
+                    User user = new(userView);
+                    if (await userManager.Users.AnyAsync(us => us.Id == user.Id).ConfigureAwait(false))
                         return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
 
-                    user.User_ID = Guid.NewGuid();
+                    user.Id = Guid.NewGuid().ToString();
                     user.RegistrationDate = DateTime.Now;
-                    user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
 
                     if (file is not null)
                     {
@@ -69,31 +69,36 @@ namespace CodeFactoryAPI.Controllers
                         else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
                     }
 
-                    unit.GetUser.Add(user);
-                    await unit.SaveAsync().ConfigureAwait(false);
-                    return Ok();
+                    var result = await userManager.CreateAsync(user, userView.Password).ConfigureAwait(false);
+                    if (result.Succeeded)
+                        return Ok();
                 }
                 catch (Exception ex)
                 {
                     await ex.LogAsync().ConfigureAwait(false);
-                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
             else return BadRequest();
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> PutUser(Guid id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] User user, IFormFile? file)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUser(string id, [FromForm][ModelBinder(typeof(FormDataModelBinder))] UserViewModel userView, IFormFile? file)
         {
-            if (id != user.User_ID)
+            if (id != userView.User_ID)
                 return BadRequest();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    unit.GetUser.Context.Attach(user);
-                    user.Password = await user.Password.EncryptAsync().ConfigureAwait(false);
+                    User user = await userManager.FindByIdAsync(id);
+
+                    if (user is null)
+                        return NotFound();
+
+                    user.UserName = userView.UserName;
+                    user.Email = userView.Email;
 
                     if (file is not null)
                     {
@@ -113,66 +118,65 @@ namespace CodeFactoryAPI.Controllers
                         }
                         else return StatusCode((int)HttpStatusCode.UnsupportedMediaType, "Select valid Image");
 
-                        unit.GetUser.Context.Entry(user)
-                            .SetUpdatedColumns(nameof(user.UserName), nameof(user.Password), nameof(user.Email), nameof(user.Image));
+                        user.Image = Guid.NewGuid() + user.UserName + file.FileName;
                     }
-                    else
-                        unit.GetUser.Context.Entry(user)
-                            .SetUpdatedColumns(nameof(user.UserName), nameof(user.Password), nameof(user.Email));
 
-                    await unit.SaveAsync().ConfigureAwait(false);
-                    if (file is not null)
+                    var result = await userManager.UpdateAsync(user).ConfigureAwait(false);
+                    if (result.Succeeded)
                     {
-                        var model = await unit.GetUser.Model.AsNoTracking()
-                                              .FirstAsync(x => x.User_ID == id)
-                                              .ConfigureAwait(false);
-                        var path = ImagePath(model.Image);
+                        if (file is not null)
+                        {
+                            {
+                                var model = await userManager.FindByIdAsync(id).ConfigureAwait(false);
+                                var path = ImagePath(model.Image);
+                                if (Exists(path))
+                                    System.IO.File.Delete(path);
+                            }
+                            return Ok();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (!await userManager.Users.AnyAsync(us => us.Id == id).ConfigureAwait(false))
+                        return NotFound();
+
+                    if (await userManager.Users.AnyAsync(us => us.UserName == userView.UserName).ConfigureAwait(false))
+                        return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
+
+                    await ex.LogAsync().ConfigureAwait(false);
+                }
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+            else return BadRequest();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                var user = await userManager.FindByIdAsync(id).ConfigureAwait(false);
+                if (user is null)
+                    return NotFound();
+                var result = await userManager.DeleteAsync(user);
+
+                if (result.Succeeded)
+                {
+                    if (user.Image is not null)
+                    {
+                        var path = ImagePath(user.Image);
                         if (Exists(path))
                             System.IO.File.Delete(path);
                     }
                     return Ok();
                 }
-                catch (Exception ex)
-                {
-                    if (!await unit.GetUser.AnyAsync(user => user.User_ID == id).ConfigureAwait(false))
-                        return NotFound();
-
-                    if (await unit.GetUser.AnyAsync(us => us.UserName == user.UserName).ConfigureAwait(false))
-                        return StatusCode((int)HttpStatusCode.AlreadyReported, "Username is already taken");
-
-                    await ex.LogAsync().ConfigureAwait(false);
-                    return StatusCode((int)HttpStatusCode.InternalServerError);
-                }
-            }
-            else return BadRequest();
-        }
-
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            try
-            {
-                var user = await unit.GetUser.FindAsync(user => user.User_ID == id)
-                                             .ConfigureAwait(false);
-                if (user is null)
-                    return NotFound();
-
-                unit.GetUser.Remove(user);
-
-                await unit.SaveAsync().ConfigureAwait(false);
-                if (user.Image is not null)
-                {
-                    var path = ImagePath(user.Image);
-                    if (Exists(path))
-                        System.IO.File.Delete(path);
-                }
-                return Ok();
             }
             catch (Exception ex)
             {
                 await ex.LogAsync().ConfigureAwait(false);
-                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
+            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         #region Dispose
@@ -191,9 +195,9 @@ namespace CodeFactoryAPI.Controllers
             {
                 if (disposing)
                 {
-                    unit.Dispose();
+                    userManager.Dispose();
                 }
-                unit = null;
+                userManager = null;
                 disposed = true;
             }
         }

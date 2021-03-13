@@ -19,16 +19,16 @@ namespace CodeFactoryAPI.Models
         public DateTime MessageDate { get; set; }
 
         [Required]
-        public Guid? Messeger_ID { get; set; }
+        public string? Messeger_ID { get; set; }
 
         [ForeignKey("Messeger_ID")]
-        public User? Messeger { get; set; }
+        public UserViewModel? Messeger { get; set; }
 
         [Required]
-        public Guid? Receiver_ID { get; set; }
+        public string? Receiver_ID { get; set; }
 
         [ForeignKey("Receiver_ID")]
-        public User? Receiver { get; set; }
+        public UserViewModel? Receiver { get; set; }
 
         [Required]
         public Guid? Question_ID { get; set; }

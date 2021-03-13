@@ -32,10 +32,10 @@ namespace CodeFactoryAPI.Models
         public DateTime AskedDate { get; set; }
 
         [Required]
-        public Guid? User_ID { get; set; }
+        public string? User_ID { get; set; }
 
         [ForeignKey("User_ID")]
-        public User? User { get; set; }
+        public UserViewModel? User { get; set; }
 
         [Required]
         public Guid? Tag1_ID { get; set; }

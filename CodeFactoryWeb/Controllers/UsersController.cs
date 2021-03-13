@@ -20,23 +20,23 @@ namespace CodeFactoryWeb.Controllers
             client = new() { BaseAddress = Extra.Addons.HostUrl };
 
         public async Task<IActionResult> Index(string? UserName, string SearchBy) =>
-            await this.ToActionResult<IEnumerable<User>>(() => client.GetUsersAsync(UserName, SearchBy));
+            await this.ToActionResult<IEnumerable<UserViewModel>>(() => client.GetUsersAsync(UserName, SearchBy));
 
-        public async Task<IActionResult> Details(Guid? id) =>
-             await this.ToActionResult<User>(() => client.GetDataAsync<User>
+        public async Task<IActionResult> Details(string? id) =>
+             await this.ToActionResult<UserViewModel>(() => client.GetDataAsync<UserViewModel>
                                       (APIName.UsersAPI, id)).ConfigureAwait(false);
 
-        public async Task<IActionResult> Edit(Guid? id) =>
+        public async Task<IActionResult> Edit(string? id) =>
             await Details(id).ConfigureAwait(false);
 
-        public async Task<IActionResult> Delete(Guid? id) =>
+        public async Task<IActionResult> Delete(string? id) =>
             await Details(id).ConfigureAwait(false);
 
         public IActionResult Create() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(User user, IFormFile? file)
+        public async Task<IActionResult> Create(UserViewModel user, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace CodeFactoryWeb.Controllers
                 {
                     using var data = new MultipartFormDataContent();
                     using var stringContent = await user.ParseToStringContentAsync().ConfigureAwait(false);
-                    data.Add(stringContent, "user");
+                    data.Add(stringContent, "userView");
 
                     if (file is not null)
                     {
@@ -84,9 +84,9 @@ namespace CodeFactoryWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, User user, [FromForm] IFormFile? file)
+        public async Task<IActionResult> Edit(string id, User user, [FromForm] IFormFile? file)
         {
-            if (id != user.User_ID)
+            if (id != user.Id)
                 ModelState.AddModelError("", "userid is changed");
             else if (ModelState.IsValid)
             {

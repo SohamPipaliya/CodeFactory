@@ -40,10 +40,10 @@ namespace CodeFactoryWeb.Extra
             return null;
         }
 
-        public async static Task<IEnumerable<User>?> GetUsersAsync(this HttpClient client, string? UserName, string? SearchBy)
+        public async static Task<IEnumerable<UserViewModel>?> GetUsersAsync(this HttpClient client, string? UserName, string? SearchBy)
         {
             string? jsonString = await client.GetStringAsync($"usersapi?UserName={UserName}&SearchBy={SearchBy}").ConfigureAwait(false);
-            return Deserialize<IEnumerable<User>>(jsonString, StandardResolver.ExcludeNull);
+            return Deserialize<IEnumerable<UserViewModel>>(jsonString, StandardResolver.ExcludeNull);
         }
         #endregion
 
@@ -73,6 +73,9 @@ namespace CodeFactoryWeb.Extra
 
         #region CustomTagHelper
         public static HtmlString Link(string name, ControllerName controllerName, ActionName actionName, Guid? id = null) =>
+            new($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
+
+        public static HtmlString Link(string name, ControllerName controllerName, ActionName actionName, string? id = null) =>
             new HtmlString($"<a href=\"/{controllerName}/{actionName}/{id}\">{name}<a>");
 
         public static string GetImage(string? name, string directory = "Questions") =>

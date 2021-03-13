@@ -156,3 +156,87 @@ Date:-   01-03-2021 09:30:44 AM
 Exception:-   Object reference not set to an instance of an object.
 StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 388
 
+Date:-   09-03-2021 09:48:44 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
+Date:-   09-03-2021 09:49:07 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:49:21 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:52:17 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:52:17 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
+Date:-   09-03-2021 09:53:37 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:53:40 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:53:42 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:53:48 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:56:04 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:56:05 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:56:06 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 09:56:07 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 10:07:45 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
+Date:-   09-03-2021 10:07:48 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 10:54:40 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
+Date:-   09-03-2021 10:54:41 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 10:56:47 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
+Date:-   09-03-2021 10:57:01 PM
+Exception:-   The entity type 'UserViewModel' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 10:59:13 PM
+Exception:-   Unable to determine the relationship represented by navigation 'Message.Messeger' of type 'UserViewModel'. Either manually configure the relationship, or ignore this property using the '[NotMapped]' attribute or by using 'EntityTypeBuilder.Ignore' in 'OnModelCreating'.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 378
+
+Date:-   09-03-2021 10:59:14 PM
+Exception:-   Unable to determine the relationship represented by navigation 'Message.Messeger' of type 'UserViewModel'. Either manually configure the relationship, or ignore this property using the '[NotMapped]' attribute or by using 'EntityTypeBuilder.Ignore' in 'OnModelCreating'.
+StackTrace:-   at CodeFactoryAPI.Extra.Addons.ToActionResult[T](ControllerBase controllerBase, Func`1 func) in C:\Users\SOHAM\Desktop\Git\CodeFactory\CodeFactoryAPI\Extra\Addons.cs:line 395
+
